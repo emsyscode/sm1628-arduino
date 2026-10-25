@@ -1,44 +1,5 @@
-// Decode the actual compiled Uno GPIO stream, not a JavaScript driver copy.
-const fs = require('node:fs');
-const path = require('node:path');
 const assert = require('node:assert/strict');
-const avr = require(process.argv[3] ? path.resolve(process.argv[3]) : 'avr8js');
-const flash = new Uint8Array(32768);
-let base = 0;
-for (const line of fs.readFileSync(process.argv[2], 'utf8').trim().split(/\r?\n/)) {
-  const r = Buffer.from(line.slice(1), 'hex');
-  assert.equal([...r].reduce((sum, b) => sum + b, 0) % 256, 0);
-  if (r[3] === 0) flash.set(r.subarray(4, 4 + r[0]), base + r.readUInt16BE(1));
-  if (r[3] === 4) base = r.readUInt16BE(4) * 65536;
-}
-const cpu = new avr.CPU(new Uint16Array(flash.buffer));
-new avr.AVRTimer(cpu, avr.timer0Config);
-const portB = new avr.AVRIOPort(cpu, avr.portBConfig);
-new avr.AVRIOPort(cpu, avr.portCConfig);
-new avr.AVRIOPort(cpu, avr.portDConfig);
-new avr.AVRUSART(cpu, avr.usart0Config, 16e6);
-let bits = null;
-const transactions = [];
-portB.addListener((value, old) => {
-  if ((old & 2) && !(value & 2)) bits = []; // D9 STB falls.
-  if (bits && !(old & 1) && (value & 1)) // D8 CLK rises.
-    bits.push((cpu.data[0x2B] & 128) ? 1 : 0); // D7 DATA.
-  if (bits && !(old & 2) && (value & 2)) {
-    assert.equal(bits.length % 8, 0, 'partial byte under STB');
-    const bytes = [];
-    for (let i = 0; i < bits.length; i += 8)
-      bytes.push(bits.slice(i, i + 8).reduce((v, b, bit) => v | (b << bit), 0));
-    transactions.push(bytes);
-    bits = null;
-  }
-});
-while (!(cpu.data[0x2B] & 64) && cpu.cycles < 1600000) {
-  avr.avrInstruction(cpu);
-  cpu.tick();
-}
-assert.equal(cpu.data[0x2B] & 32, 0, 'firmware assertion failed');
-assert(cpu.data[0x2B] & 64, 'firmware did not complete');
-assert.equal(bits, null, 'STB left active');
+const {cpu,transactions} = require('./run-avr.cjs')(process.argv[2],process.argv[3]);
 const blank = Array(14).fill(0);
 const raw = Array.from({length: 14}, (_, i) => (0x81 ^ (i * 13)) & 255);
 const glyph = Array(14).fill(0);
