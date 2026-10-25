@@ -1,0 +1,96 @@
+{
+  "status": "UNMAPPED",
+  "board": null,
+  "ic_marking": null,
+  "digit_order": "front view, left to right",
+  "connector": null,
+  "mode_command": null,
+  "digits": [
+    {
+      "digit": 0,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 1,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 2,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 3,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 4,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 5,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    },
+    {
+      "digit": 6,
+      "segments": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "f": null,
+        "g": null
+      }
+    }
+  ],
+  "icons": [],
+  "evidence": []
+}

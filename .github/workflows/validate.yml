@@ -1,0 +1,22 @@
+name: Validate library
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  uno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: arduino-cli core update-index
+      - run: arduino-cli core install arduino:avr@1.8.6
+      - name: Compile examples and protocol fixture
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno --library . examples/RawFrame
+          arduino-cli compile --fqbn arduino:avr:uno --library . examples/SegmentWalk
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/protocol tests/ProtocolTest
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run test:avr
