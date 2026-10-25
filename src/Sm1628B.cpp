@@ -55,6 +55,10 @@ void Sm1628B::displayControl() {
 bool Sm1628B::begin(uint8_t brightness) {
   if (brightness > 7 || data_ == clock_ || data_ == strobe_ ||
       clock_ == strobe_) return false;
+#if defined(NUM_DIGITAL_PINS)
+  if (data_ >= NUM_DIGITAL_PINS || clock_ >= NUM_DIGITAL_PINS ||
+      strobe_ >= NUM_DIGITAL_PINS) return false;
+#endif
   // Establish idle levels before enabling the three outputs.
   digitalWrite(strobe_, HIGH);
   digitalWrite(clock_, HIGH);
@@ -75,12 +79,17 @@ bool Sm1628B::begin(uint8_t brightness) {
 }
 
 bool Sm1628B::writeFrame(const Frame& frame) {
-  if (!ready_) return false;
-  command(0x40);          // Write data, increment RAM address.
+  return writeRange(0, frame.bytes, Frame::kSize);
+}
+
+bool Sm1628B::writeRange(uint8_t start, const uint8_t* data, uint8_t length) {
+  if (!ready_ || !data || length == 0 || start >= Frame::kSize ||
+      length > Frame::kSize - start) return false;
+  command(0x40);  // Auto-increment writes, also for a partial range.
   digitalWrite(strobe_, LOW);
   delayMicroseconds(1);
-  sendByte(0xC0);         // First byte is the RAM start-address command.
-  for (uint8_t i = 0; i < Frame::kSize; ++i) sendByte(frame.bytes[i]);
+  sendByte(uint8_t(0xC0 | start));
+  for (uint8_t i = 0; i < length; ++i) sendByte(data[i]);
   digitalWrite(strobe_, HIGH);
   delayMicroseconds(1);
   return true;

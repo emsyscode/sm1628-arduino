@@ -13,10 +13,16 @@ jobs:
           node-version: '22'
       - run: arduino-cli core update-index
       - run: arduino-cli core install arduino:avr@1.8.6
-      - name: Compile examples and protocol fixture
+      - name: Compile examples with bench output disabled
         run: |
-          arduino-cli compile --fqbn arduino:avr:uno --library . examples/RawFrame
-          arduino-cli compile --fqbn arduino:avr:uno --library . examples/SegmentWalk
+          for name in Minimal RawFrame SegmentWalk BufferedCounter; do
+            arduino-cli compile --fqbn arduino:avr:uno --library . "examples/$name"
+          done
+      - name: Compile active examples and test fixtures
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno --build-property "compiler.cpp.extra_flags=-DSM1628_BENCH_READY=1" --build-path build/minimal examples/Minimal
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-property "compiler.cpp.extra_flags=-DSM1628_BENCH_READY=1" --build-path build/counter examples/BufferedCounter
           arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/protocol tests/ProtocolTest
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/panel tests/PanelTest
       - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm run test:avr

@@ -1,35 +1,53 @@
-# Validation — 2026-10-25
+# Validation
 
-Initial local checks passed using Arduino AVR core 1.8.6 and Uno.
+## Version 0.2.0 — 2026-10-25
+
+Uno / Arduino AVR core 1.8.6; example output enabled for the active builds below.
 
 | Build | Flash | Static SRAM |
 | --- | ---: | ---: |
+| Standalone Minimal | 1,076 bytes | 28 bytes |
+| BufferedCounter | 2,298 bytes | 248 bytes |
 | ProtocolTest | 2,034 bytes | 29 bytes |
-| RawFrame (bench guard disabled) | 1,540 bytes | 188 bytes |
-| SegmentWalk (bench guard disabled) | 1,538 bytes | 188 bytes |
+| PanelTest | 3,288 bytes | 267 bytes |
 
-The protocol fixture exercises the real library. avr8js 0.21.1 executed the
-compiled Uno firmware and decoded D7/D8/D9: 19 transactions passed in
-16.532 ms of simulated CPU time.
+Local compiled-AVR simulation passed:
+- 19 raw protocol transactions.
+- 149 mapped-panel transactions, including all ten original numeral masks
+  at each of the six source-derived digit positions.
+- Standalone initialization and both 500 ms blink transitions.
 
-Checks cover bit order, byte boundaries, initial blanking/clear, full frame
-payload, brightness/on-off behavior, invalid inputs, non-contiguous segment
-mapping, atomic map rejection and preservation of unrelated outputs.
-Fixture D5 stays low on success and D6 signals completion.
+The panel fixture also checks seven-digit capacity, overflow, padding,
+preservation of an unrelated icon, invalid/aliased maps, copied map lifetime,
+suppression of unchanged frames, forced resend, restoration after external
+writes and bounded RAM writes. Reference masks/grid shifts are recorded with
+the original source blob identity in tests/legacy-reference.json.
 
 Only inherited Arduino core new.cpp unused-parameter warnings were emitted.
-The installed AVR compiler required running outside the Windows sandbox due
-to its DLL relocation error. No firmware was uploaded.
+The local compiler required execution outside the Windows sandbox because of
+its DLL relocation error. No firmware was uploaded.
+Pin-range rejection was added after these size measurements; CI recompiles and
+tests that final revision. Sizes above identify the local pre-pin-guard build.
 
-To reproduce from this repository:
-1. Install arduino-cli and Arduino AVR core 1.8.6.
-2. Compile: arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/protocol tests/ProtocolTest
-3. Install dev dependencies: npm install --ignore-scripts --no-audit --no-fund
-4. Run: npm run test:avr
+## Reproduce
 
-The local run reused the existing avr8js installation via the decoder's optional
-third argument (module path). CI uses the pinned package.json dependency.
+Install arduino-cli, Arduino AVR core 1.8.6 and Node.js.
+The exact compile commands, including both guarded/active examples, are in
+.github/workflows/validate.yml. Build the two fixtures to build/protocol and
+build/panel, and the enabled Minimal example to build/minimal, then run:
 
-This is a GPIO/software test, not an electrical, optical or SM1628 IC simulation.
-Bench wiring, exact revision commands, refresh/readability, a seven-digit map
-and a playable hardware game remain unverified.
+    npm install --ignore-scripts --no-audit --no-fund
+    npm run test:avr
+
+Local runs reused avr8js 0.21.1 from the existing project via the decoder's
+optional third argument (module path). CI installs the pinned dev dependency.
+
+These tests decode the real compiled AVR GPIO stream. They are not an SM1628 IC,
+electrical or optical simulation. The legacy profile is code-derived; the new
+seven-digit panel map and hardware refresh/readability remain unverified.
+
+## Earlier 0.1.0 baseline
+
+ProtocolTest: 2,034 bytes flash / 29 bytes static SRAM. RawFrame and SegmentWalk
+with their bench guard disabled: 1,540/1,538 bytes flash, respectively, and
+188 bytes static SRAM each. Original protocol regression: 19 transactions.

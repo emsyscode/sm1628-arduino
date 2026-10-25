@@ -32,6 +32,8 @@ class Sm1628B {
   // Brightness 0 is the lowest enabled setting; setEnabled(false) blanks.
   bool begin(uint8_t brightness = 0);
   bool writeFrame(const Frame& frame);
+  // Nonempty, bounded auto-increment write; invalid ranges send nothing.
+  bool writeRange(uint8_t start, const uint8_t* data, uint8_t length);
   bool clear();
   bool setBrightness(uint8_t level);
   bool setEnabled(bool enabled);

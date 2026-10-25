@@ -1,42 +1,50 @@
 # SM1628 Arduino
 
-A cleaner development base for reusing salvaged seven-segment display panels,
-starting with SM1628B and a Snake project.
+Clean SM1628B display code based on Jose Luis Monteiro's salvaged-panel examples.
 
-**Status: experimental, not yet bench tested.** The initial transport follows
-the original SM1628B examples' mode 0x03 and 14-byte RAM write. The exact IC,
-electrical setup and segment map of the new seven-digit board remain pending.
-TM1628, SM1628C and every board bearing a similar marking are not automatically
-compatible.
+**Experimental: software tested, hardware validation pending.** Mode 0x03 and
+fourteen-byte writes follow the original SM1628B examples. The new seven-digit
+board's exact IC, wiring and map remain unconfirmed. Similar names such as TM1628
+or SM1628C do not establish compatibility.
 
-## Start here
+## Choose a starting point
+
+| Version | Open | Purpose |
+| --- | --- | --- |
+| Small standalone sketch | [Minimal.ino](examples/Minimal/Minimal.ino) | Understand initialization and frame writes in one short file; no library dependency |
+| Fuller library | [MappedPanel.h](src/MappedPanel.h) | Mapped digits/numbers, individual segments/icons, buffered updates and input validation |
+| Raw driver | [Sm1628B.h](src/Sm1628B.h) | Full frames, bounded RAM writes, brightness and display control |
+
+The fuller version adds functionality alongside the small version; the teaching
+sketch stays small. [What changed from the originals](docs/code-review.md).
+
+## Follow the tutorials
 
 1. [Identify the board and bring it up](docs/01-bring-up.md).
-2. [Discover and record its segment map](docs/02-mapping.md).
-3. Try SegmentWalk, then RawFrame from the Arduino examples menu.
-4. [Read the protocol and implementation notes](docs/protocol.md).
-5. [Review sources and remaining work](docs/sources.md).
+2. [Walk outputs and record the panel map](docs/02-mapping.md).
+3. [Understand the small sketch](docs/minimal.md).
+4. [Use the buffered API](docs/api.md) and [BufferedCounter](examples/BufferedCounter/BufferedCounter.ino).
+5. [Read the inherited protocol](docs/protocol.md) and [validation evidence](docs/validation.md).
 
-Install this folder as an Arduino library (or use arduino-cli --library with
-its absolute path). The examples keep hardware output disabled until their
-kBenchReady flag is deliberately changed after checking the setup.
+For library examples, install this folder as an Arduino library or pass
+arduino-cli --library with its absolute path. Minimal.ino is standalone.
+Examples keep hardware output disabled until the bench setup is confirmed.
+Minimal and BufferedCounter use SM1628_BENCH_READY=1; earlier RawFrame and
+SegmentWalk examples use their local kBenchReady flag.
 
-## Structure
+The included six-digit map is CODE_DERIVED from the 2020 source; it is not a map
+of the new seven-digit board. A blank [profile template](profiles/template.json)
+is provided for that board's measured map.
 
-- src/: transport, a small raw frame buffer and explicit glyph mapping.
-- examples/: small standalone steps, separate from the game.
-- profiles/: board map template; no fabricated working map.
-- tests/: compiled AVR protocol/mapping fixture and GPIO decoder.
-- docs/: tutorials, evidence, validation and work still required.
+No timer reservation, heap allocation or whole-port GPIO writes are used.
+Rendering is separate from sending, so the application can read its joystick
+between updates. No measured joystick/display latency is claimed.
 
-No timer is reserved and no entire AVR port is reconfigured. The library changes
-only its three assigned GPIOs and contains no clock demo, key scanner or game loop.
-An entire frame is sent in one address/data transaction. This removes the old
-application's long reporting/demo delays; hardware timing still needs measurement.
+Hardware Snake integration follows the panel map. Video scripts and animations
+remain in the production project. Key-read support awaits exact-part review;
+the original key code has a memory indexing bug and inconsistent read lengths.
 
-The Snake browser prototype and video-production assets remain in their existing
-projects for now. Hardware Snake integration follows a verified panel map.
-
-Based on work by [Jose Luis Monteiro / emsyscode](https://github.com/emsyscode).
-See [source history](docs/sources.md). No new distribution license has been chosen
-yet; settle that with the authors before public release.
+Based on [Jose Luis Monteiro / emsyscode](https://github.com/emsyscode).
+[Source history and remaining work](docs/sources.md).
+No distribution license has been selected yet; agree it with the authors before
+public release.

@@ -18,6 +18,8 @@ void setup() {
   require(!display.begin(8));
   sm1628::Sm1628B invalid(7, 7, 9);
   require(!invalid.begin());
+  sm1628::Sm1628B invalidPin(255, 8, 9);
+  require(!invalidPin.begin());
   require(display.begin(0));
   for (uint8_t i = 0; i < sm1628::Frame::kSize; ++i)
     frame.bytes[i] = uint8_t(0x81u ^ (i * 13u));
