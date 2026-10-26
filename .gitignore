@@ -2,3 +2,8 @@ build/
 node_modules/
 __pycache__/
 *.pyc
+
+# Test harness receives an exact copy from the game source before compilation.
+tests/GameChecks/SnakeGame.h
+
+

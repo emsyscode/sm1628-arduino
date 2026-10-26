@@ -4,6 +4,18 @@ Based on Jose Luis Monteiro's original sketch, preserved byte-for-byte under
 reference/WorkingPanel. Earlier generated examples failed on this salvaged
 panel and remain archived. The creator confirms the clean PanelDemo now works.
 
+## First Snake hardware test
+
+[PanelSnake sketch](firmware/PanelSnake/PanelSnake.ino) and
+[step-by-step bench guide](docs/snake-test.md) are ready as an experimental test.
+Uno: panel D7/D8/D9, joystick signals A0/A1. Keep the tested supply/divider.
+Serial Monitor 115200: hold joystick centred for calibration, then m to check
+bars, j to check input directions, and s to play. Read the guide before upload.
+Optional beeps are disabled until a buzzer connection is confirmed.
+Compile/simulation checks passed; actual combined hardware test is pending.
+The cleaned standalone [joystick reader](firmware/JoystickTest/JoystickTest.ino)
+is also included (115200 baud, readings every 500 ms).
+
 ## Map the panel manually
 
 Open [firmware/ManualMap/ManualMap.ino](firmware/ManualMap/ManualMap.ino)

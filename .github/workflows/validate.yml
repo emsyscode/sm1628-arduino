@@ -25,4 +25,10 @@ jobs:
       - run: npm test
 
       - run: node tests/manual-map.cjs build/manual/ManualMap.ino.hex
-
+      - name: Compile Snake and its engine checks
+        run: |
+          cp firmware/PanelSnake/SnakeGame.h tests/GameChecks/SnakeGame.h
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/snake firmware/PanelSnake
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/game-checks tests/GameChecks
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/joystick firmware/JoystickTest
+      - run: node tests/panel-snake.cjs build/snake/PanelSnake.ino.hex build/game-checks/GameChecks.ino.hex
