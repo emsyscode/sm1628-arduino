@@ -6,7 +6,7 @@
     D7: display DATA     D8: display CLK     D9: display STB
     A0: joystick X      A1: joystick Y
     D4: START button to GND, using the internal pull-up
-    D11: active buzzer control, HIGH = sound and LOW = silence
+    D11: 2N2222 buzzer-driver control (10 kOhm base resistor), HIGH = sound
     Keep the existing supply, joystick divider and common ground. Z is unused.
 
   Operation

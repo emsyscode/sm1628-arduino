@@ -38,6 +38,8 @@ Keep the existing tested supply arrangement.
 
 ## Other tests and references
 
+- [Circuit inventory](docs/circuit-inventory.md): resistor/capacitor values, joystick terminals, START network and 2N2222 buzzer driver.
+
 - [PanelDemo](firmware/PanelDemo/PanelDemo.ino): corrected numeric-only loop, seven digits left to right.
 - [LegacyPanelDemo](firmware/LegacyPanelDemo/LegacyPanelDemo.ino): exact former loop with inherited icon bits, for comparison only.
 - [Symbol-bit correction explained](docs/symbol-bit-correction.md).

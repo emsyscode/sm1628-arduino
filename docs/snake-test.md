@@ -117,7 +117,7 @@ flag. A new frame is sent on a 40 ms schedule; the chip performs its own scannin
 
 ## Buzzer
 
-Sound is enabled on D11. The active-buzzer configuration uses HIGH to sound and LOW to silence. Pulses are timed without blocking gameplay: 40ms at start, 60ms for food and 180ms for death/end. The display's D7/D8/D9 signals remain unchanged. Maintain the existing buzzer wiring/common ground.
+Sound is enabled on D11. The active-buzzer configuration uses HIGH to sound and LOW to silence. Pulses are timed without blocking gameplay: 40ms at start, 60ms for food and 180ms for death/end. The display's D7/D8/D9 signals remain unchanged. The buzzer driver uses a 2N2222 transistor with a 10 kΩ base resistor; D11 is the control signal for this stage. See circuit-inventory.md for the reported components and connection details.
 
 ## Validation and limits
 
