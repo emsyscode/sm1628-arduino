@@ -9,9 +9,9 @@ effect separately or a complete repeatable sequence.
 
 1. Keep the existing tested panel supply, common ground and Uno wiring:
    D7 DATA, D8 CLK, D9 STB.
-2. The legacy setup drives D1..D13 as outputs; keep other peripherals off those
-   pins. D0 is restored as serial RX. Joystick signals A0/A1 and START on A2
-   are not read by this sketch; the game is in PanelSnake.
+2. The legacy setup drives D1..D13, except D4, as outputs; keep other peripherals off those
+   pins. D0 is restored as serial RX. Joystick signals A0/A1 and START on D4
+   are not read by this sketch; D4 remains an input with pull-up and D11 buzzer stays LOW/silent. The game is in PanelSnake.
 3. Open firmware/PanelShowcase/PanelShowcase.ino, select Arduino Uno and upload.
    No external library or joystick is required.
 4. Open Serial Monitor at **115200 baud**, select **Newline** or **Both NL & CR**.
@@ -143,6 +143,6 @@ These do not measure real optical refresh or camera readability.
 The new showcase still needs its first hardware/filming test.
 
 To play Snake again, upload firmware/PanelSnake with SnakeGame.h beside it.
-Keep the joystick centred through calibration, then press START (A2 to GND).
+Keep the joystick centred through calibration, then press START (D4 to GND).
 The previously accepted joystick/game version remains in repository history.
 

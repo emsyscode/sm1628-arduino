@@ -2,7 +2,8 @@
  PanelShowcase - filming/demo effects for our salvaged SM1628B panel.
  Based on Jose Luis Monteiro's tested command/burst transport.
  Uno: D7 DATA, D8 CLK, D9 STB; keep the tested supply/common ground.
- Legacy D1..D13 output setup is retained. D0 is serial RX. No joystick needed.
+ Legacy D1..D13 output setup is retained, except D4. D0 is serial RX. D4 START remains an input; D11
+ active buzzer remains silent. No joystick needed.
 
  UPLOAD AND USE
  Open Serial Monitor: 115200 baud, Newline or Both. Starts BLANK.
@@ -22,6 +23,9 @@
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <string.h>
+constexpr uint8_t kStartPin = 4;
+constexpr uint8_t kBuzzerPin = 11;
+
 constexpr uint8_t kDataPin = 7, kClockPin = 8, kStrobePin = 9;
 constexpr uint8_t kDisplayMode = 0x03, kFullBrightness = 0x8F, kFrameBytes = 14;
 constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
@@ -30,6 +34,7 @@ constexpr uint8_t kNumerals[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x0
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 uint8_t frame[14] = {};
+
 enum Effect : uint8_t {
   OFF,
   DIGITS,
@@ -44,6 +49,7 @@ enum Effect : uint8_t {
   RANDOM_DIGITS,
   BARS
 };
+
 uint8_t effect = OFF, cueIndex = 0;
 uint32_t step = 0, counterStart = 0, seed = 1, randomState = 1;
 unsigned long lastStepAt = 0;
@@ -61,11 +67,13 @@ struct Cue {
   uint16_t pace, ticks;
   uint32_t value;
 };
+
 const Cue kCues[] = {{OFF, 1500, 1, 0},           {DIGITS, 600, 7, 0},  {GROUPS, 500, 10, 0},
                      {BLINK, 500, 8, 0},          {COUNT, 400, 10, 0},  {CARRY, 250, 20, 9995},
                      {CHASE, 100, 49, 0},         {FILL, 65, 106, 0},   {SPARKLE, 120, 35, 0},
                      {RANDOM_DIGITS, 200, 20, 0}, {ALL_ON, 1000, 1, 0}, {OFF, 1000, 1, 0}};
 constexpr uint8_t kCueCount = sizeof(kCues) / sizeof(kCues[0]);
+
 void sendCommand(uint8_t value) {
   // STB frames a single command. Keep the original command-specific timing.
   digitalWrite(kStrobePin, LOW);
@@ -124,22 +132,31 @@ void sendFrame() {
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   sendBurstByte(0xC0);
-  for (uint8_t i = 0; i < 14; ++i) sendBurstByte(frame[i]);
+  for (uint8_t i = 0; i < 14; ++i)
+    sendBurstByte(frame[i]);
   digitalWrite(kStrobePin, HIGH);
   sendCommand(kFullBrightness);
 }
+
 void columnGlyph(uint8_t column, uint8_t mask) {
-  if (column > 9) return;  // Only ten established panel groups.
+  if (column > 9)
+    return;  // Only ten established panel groups.
   for (uint8_t row = 0; row < 7; ++row)
-    if (mask & (1u << row)) frame[row * 2 + column / 8] |= uint8_t(1u << (column % 8));
+    if (mask & (1u << row))
+      frame[row * 2 + column / 8] |= uint8_t(1u << (column % 8));
 }
-void cell(uint8_t id) { columnGlyph(kDigitColumns[id / 7], uint8_t(1u << (id % 7))); }
+
+void cell(uint8_t id) {
+  columnGlyph(kDigitColumns[id / 7], uint8_t(1u << (id % 7)));
+}
+
 uint32_t randomNext() {
   randomState ^= randomState << 13;
   randomState ^= randomState >> 17;
   randomState ^= randomState << 5;
   return randomState;
 }
+
 const __FlashStringHelper* effectName(uint8_t e) {
   switch (e) {
     case DIGITS:
@@ -168,6 +185,7 @@ const __FlashStringHelper* effectName(uint8_t e) {
       return F("off");
   }
 }
+
 void render() {
   memset(frame, 0, sizeof(frame));
   switch (effect) {
@@ -180,7 +198,8 @@ void render() {
     case ALL_ON:
     case BLINK:
       if (effect == ALL_ON || step % 2 == 0)
-        for (uint8_t col = 0; col < 10; ++col) columnGlyph(col, 0x7F);
+        for (uint8_t col = 0; col < 10; ++col)
+          columnGlyph(col, 0x7F);
       break;
     case COUNT:
       for (uint8_t digit = 0; digit < 7; ++digit)
@@ -197,16 +216,19 @@ void render() {
       break;
     }
     case CHASE:
-      for (uint8_t tail = 0; tail < 5; ++tail) cell(uint8_t((step + 49 - tail) % 49));
+      for (uint8_t tail = 0; tail < 5; ++tail)
+        cell(uint8_t((step + 49 - tail) % 49));
       break;
     case FILL: {
       const uint8_t p = step % 106;
       const uint8_t count = p < 49 ? p + 1 : (p < 53 ? 49 : (p < 102 ? 101 - p : 0));
-      for (uint8_t i = 0; i < count; ++i) cell(i);
+      for (uint8_t i = 0; i < count; ++i)
+        cell(i);
       break;
     }
     case SPARKLE:
-      for (uint8_t i = 0; i < 12; ++i) cell(randomNext() % 49);
+      for (uint8_t i = 0; i < 12; ++i)
+        cell(randomNext() % 49);
       break;
     case RANDOM_DIGITS:
       for (uint8_t digit = 0; digit < 7; ++digit)
@@ -221,6 +243,7 @@ void render() {
   }
   sendFrame();
 }
+
 void status() {
   Serial.print(F("CUE ms="));
   Serial.print(millis());
@@ -235,6 +258,7 @@ void status() {
   Serial.print(F(" sequence="));
   Serial.println(sequence);
 }
+
 void activate(uint8_t e, uint16_t pace, uint32_t value) {
   effect = e;
   intervalMs = pace;
@@ -246,11 +270,13 @@ void activate(uint8_t e, uint16_t pace, uint32_t value) {
   render();
   status();
 }
+
 void beginCue() {
   const Cue& cue = kCues[cueIndex];
   activate(cue.effect, cue.pace, cue.value);
   running = true;  // Blank/all-on cues still have a bounded duration in demo.
 }
+
 void beginSequence(bool repeat) {
   sequence = true;
   repeating = repeat;
@@ -259,6 +285,7 @@ void beginSequence(bool repeat) {
                         : F("DEMO: one full sequence, then blank."));
   beginCue();
 }
+
 void stop(bool clear) {
   sequence = false;
   repeating = false;
@@ -271,17 +298,22 @@ void stop(bool clear) {
   Serial.println(clear ? F("STOP: blank.")
                        : F("HOLD: current frame frozen; start an effect to resume."));
 }
+
 bool number(const char* text, uint32_t maximum, uint32_t& value) {
-  if (!text || !*text) return false;
+  if (!text || !*text)
+    return false;
   value = 0;
   for (const char* p = text; *p; ++p) {
-    if (*p < '0' || *p > '9') return false;
+    if (*p < '0' || *p > '9')
+      return false;
     const uint8_t digit = *p - '0';
-    if (value > maximum / 10 || (value == maximum / 10 && digit > maximum % 10)) return false;
+    if (value > maximum / 10 || (value == maximum / 10 && digit > maximum % 10))
+      return false;
     value = value * 10 + digit;
   }
   return true;
 }
+
 void help() {
   Serial.println(F("PanelShowcase: 115200 baud, Newline/Both. START: digits"));
   Serial.println(
@@ -297,9 +329,11 @@ void help() {
   Serial.println(
       F("Camera start/stop stays manual. Effects are demonstration footage, not gameplay."));
 }
+
 void executeLine() {
   char* cmd = strtok(line, " \t");
-  if (!cmd) return;
+  if (!cmd)
+    return;
   char* arg = strtok(nullptr, " \t");
   if (strtok(nullptr, " \t")) {
     Serial.println(F("ERR: too many arguments; unchanged."));
@@ -324,7 +358,8 @@ void executeLine() {
     } else if (!strcmp(cmd, "value")) {
       counterStart = value;
       step = 0;
-      if (effect == CARRY) render();
+      if (effect == CARRY)
+        render();
     } else {
       seed = value;
       randomState = seed;
@@ -387,6 +422,7 @@ void executeLine() {
   repeating = false;
   activate(next, individualPace, counterStart);
 }
+
 void commands() {
   while (Serial.available()) {
     const char c = char(Serial.read());
@@ -407,6 +443,7 @@ void commands() {
     }
   }
 }
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -424,12 +461,16 @@ void setup() {
   DDRB = 0xFF;
   PORTB = 0;
   pinMode(0, INPUT);
+  pinMode(kStartPin, INPUT_PULLUP);
+  pinMode(kBuzzerPin, OUTPUT);
+  digitalWrite(kBuzzerPin, LOW);
   initializePanel();
   clearPanel();
   sei();
   help();
   Serial.println(F("READY: blank. First send digits, demo, or loop."));
 }
+
 void loop() {
   commands();
   const unsigned long now = millis();
@@ -452,6 +493,7 @@ void loop() {
       render();
   }
 }
+
 ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;

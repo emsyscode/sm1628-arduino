@@ -7,7 +7,7 @@ Do not edit that file. Keep its byte-level identity checked in CI.
 The exact accepted comparison is firmware/LegacyPanelDemo. Active PanelDemo is now the explicitly corrected numeric-only physical-order loop; ManualMap slot is clean, and legacy-slot reproduces inherited icon bits.
 Keep sender timing, command order, pattern bytes, brightness, scan-slot order,
 per-frame blanking and register setup until a particular change has passed a
-separate hardware comparison. Label any untested replacement plainly.
+separate hardware comparison. Record validation per revision in docs/validation.md and the production project state, not in source comments.
 Do not infer a panel connector map or physical digit order from generic fonts.
 
 The reference's whole-port setup owns Uno D0..D13; never silently combine it
@@ -20,4 +20,6 @@ Do not add game, key reading, clock demo or generalized family support until
 the display baseline is accepted. Preserve attribution and original sources.
 
 Creator-authorized correction2026-10-26: normal numeral paths must not copy inherited second-byte icon masks. Preserve exact payloads only in the untouched reference, LegacyPanelDemo and explicit legacy-slot reproduction. Raw symbol-column tests remain legitimate. Explain setup, first command, expected result, and whether indices mean raw columns or physical digits in source and external docs. See docs/symbol-bit-correction.md.
+
+Creator style preference2026-10-26: use readable multi-line formatting and blank lines between functions/logical blocks. Apply .clang-format to firmware only; never reformat the byte-preserved supplied reference. Source comments explain wiring, operation and rationale; do not embed temporary untested/pending status or development disclaimers. Keep validation status in versioned external documentation. START=D4, buzzer=D11.
 

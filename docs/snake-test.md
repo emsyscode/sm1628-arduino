@@ -17,14 +17,15 @@ The creator reports the original joystick-controlled game works correctly on the
 | Joystick X signal | A0 (initial assignment to verify) |
 | Joystick Y signal | A1 (initial assignment to verify) |
 | Joystick Z | Unused |
-| Momentary START button | A2 to GND; internal pull-up |
+| Momentary START button | D4 to GND; internal pull-up |
+| Buzzer control | D11 |
 
 Retain the **already tested** display supply, joystick resistor network and
 common ground. This is not a replacement wiring/power schematic. A0/A1 are the
 two pins in the supplied joystick test; which one is physically X must be
 checked with direction reports. Do not connect signals outside the Uno's input
-range. The inherited compatibility setup still drives D1..D13 as outputs;
-disconnect other peripherals on those pins during this test.
+range. The inherited compatibility setup still drives D1..D13, except D4, as outputs;
+Reserve D4 for START and D11 for the buzzer; keep other peripherals off that output bank.
 
 Open firmware/PanelSnake/PanelSnake.ino in Arduino IDE with SnakeGame.h beside
 it, select Arduino Uno, then upload. No external display/game library is needed.
@@ -65,7 +66,7 @@ and reports BOARD COMPLETE before the end sequence.
 
 ## START button
 
-Use a normally open momentary button between A2 and GND. INPUT_PULLUP holds the input HIGH when released; a press connects it to GND (LOW). No extra pull-up resistor is required for this input. A2 is separate from the inherited D1..D13 output bank. On a four-leg tactile button, use contacts that are open when released and joined only when pressed.
+Use a normally open momentary button between D4 and GND. INPUT_PULLUP holds the input HIGH when released; a press connects it to GND (LOW). No extra pull-up resistor is required for this input. D4 is explicitly restored as an input after the inherited whole-port setup. On a four-leg tactile button, use contacts that are open when released and joined only when pressed.
 
 The code requires 30ms of stable input and one new press. Holding at startup requires release before pressing to start. A press during play does not reset the round; after GAME OVER, a fresh press starts again. The button can also leave the bar test and start play. Calibration must finish first. Serial s remains available.
 
@@ -110,14 +111,13 @@ bar assignment is not yet bench-verified. The renderer writes all 14 bytes, leav
 symbol columns 6,8,9 clear. Food blinks while the body stays solid during play.
 
 Command/burst timing, startup, scan mode 03, full brightness 8F, per-frame blanking,
-initial clears and compatibility register setup are inherited. This sketch adds
-D0 serial RX and A0/A1 analog inputs; no joystick is attached to the inherited
+initial clears and compatibility register setup are inherited. This sketch adds D0 serial RX, D4 START input with pull-up, D11 buzzer control, and A0/A1 analog inputs; no joystick is attached to the inherited
 D1..D13 output bank. Game state and input timing do not use the retained Timer1
 flag. A new frame is sent on a 40 ms schedule; the chip performs its own scanning.
 
-Optional beeps are **disabled by default**: kBuzzerPin=-1. If a suitable passive
-buzzer connection is confirmed, set it to 3; tone is requested for food and death.
-No buzzer hardware was supplied/verified, and the silent default is intentional.
+## Buzzer
+
+Sound is enabled on D11. The active-buzzer configuration uses HIGH to sound and LOW to silence. Pulses are timed without blocking gameplay: 40ms at start, 60ms for food and 180ms for death/end. The display's D7/D8/D9 signals remain unchanged. Maintain the existing buzzer wiring/common ground.
 
 ## Validation and limits
 
