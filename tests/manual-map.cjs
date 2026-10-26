@@ -32,6 +32,11 @@ const expectFrame=(cmd,frame)=>{
 };
 const seven=c=>Array.from({length:14},(_,i)=>i%2===0 && i<=4 ? (1<<c) : 0);
 expectFrame('column 0 7',seven(0));
+expectFrame('slot 0 7',seven(0));
+const legacy=seven(0).map((v,i)=>i%2 && i!==3 ? 2 : v);
+expectFrame('legacy-slot 0 7',legacy);
+expectFrame('slot 0 7',seven(0)); // Must clear symbols from preceding legacy frame.
+expectFrame('column 0 7',seven(0));
 assert(output.includes('numeric position 1 from left, numeral 7'));
 expectFrame('n',seven(1));
 expectFrame('ordered',seven(0));
@@ -58,4 +63,5 @@ expectFrame('clear',Array(14).fill(0));
 command('frame');assert(output.includes('RAM 00..0D: '+Array(14).fill('00').join(' ')));
 const held=packets.length;run(1000);assert.equal(packets.length,held,'no automatic stepping');
 console.log('PASS: compiled Uno UART commands, full frames, bit stepping, invalid inputs, RX direction and indefinite hold.');
+
 

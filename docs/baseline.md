@@ -1,3 +1,5 @@
+CURRENT ROUTING (2026-10-26): the exact former PanelDemo described in this historical baseline record is now firmware/LegacyPanelDemo. The new PanelDemo is a numeric-only physical-order test. See docs/symbol-bit-correction.md for the deliberate correction and new checks. The original refactor was subsequently reported working by the creator; the latest corrected numeric renderer still needs a hardware run.
+
 # Baseline and evidence
 
 ## Supplied source
@@ -52,3 +54,4 @@ It also means this baseline must not be combined with joystick wiring yet.
 
 The reference includes an inactive key-reader out-of-bounds write. That code
 is preserved only in the untouched source, not enabled or copied into PanelDemo.
+

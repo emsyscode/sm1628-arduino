@@ -1,3 +1,5 @@
+CURRENT ROUTING (2026-10-26): the exact former PanelDemo described in this historical baseline record is now firmware/LegacyPanelDemo. The new PanelDemo is a numeric-only physical-order test. See docs/symbol-bit-correction.md for the deliberate correction and new checks. The original refactor was subsequently reported working by the creator; the latest corrected numeric renderer still needs a hardware run.
+
 # Validation of the new baseline
 
 ## Evidence levels
@@ -41,7 +43,7 @@ compilation succeeded outside the sandbox with user approval.
 Install Arduino CLI, Arduino AVR core 1.8.6 and Node.js.
 
     arduino-cli compile --fqbn arduino:avr:uno --build-path build/reference reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0
-    arduino-cli compile --fqbn arduino:avr:uno --build-path build/refactor firmware/PanelDemo
+    arduino-cli compile --fqbn arduino:avr:uno --build-path build/refactor firmware/LegacyPanelDemo
     npm install --ignore-scripts --no-audit --no-fund
     npm test
 
@@ -59,3 +61,4 @@ source slot. Stop further driver cleanup until that comparison succeeds.
 No game logic, key reader, joystick or new pin assignment is introduced in this
 retest. The original's whole-port direction setup must be resolved before adding
 those inputs.
+

@@ -44,3 +44,7 @@ Same startup, pin assignments, whole-port/Timer1 setup, pattern bytes and
 command/burst senders as PanelDemo. Only the loop, selected numeral, hold schedule
 and serial messages differ. It still configures Uno D0..D13 as outputs; do not
 add joystick wiring to this test. No firmware was uploaded by the assistant.
+
+Correction2026-10-26: SlotMap now sends only first-byte numeral strokes; inherited second-byte icon masks are cleared. Raw slot6 still deliberately selects the return/colon group. The earlier exact payload is preserved in LegacyPanelDemo and ManualMap legacy-slot. See symbol-bit-correction.md.
+
+

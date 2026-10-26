@@ -11,21 +11,11 @@ constexpr uint8_t kDisplayMode = 0x03;
 constexpr uint8_t kFullBrightness = 0x8F;
 constexpr uint8_t kFrameBytes = 14;
 
-// Literal patterns from the working sketch, including its second-byte bits.
-// Each pair corresponds to a,b,c,d,e,f,g in source order.
-// Do not replace the second bytes with zeros or use a generic numeral font.
-const uint8_t kPatterns[10][kFrameBytes] = {
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010}, // 0
-  {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010}, // 1
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010}, // 2
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010}, // 3
-  {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010}, // 4
-  {0b00000001, 0b00000010, 0b00000000, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010}, // 5
-  {0b00000001, 0b00000010, 0b00000000, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010}, // 6
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010}, // 7
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010}, // 8
-  {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010}, // 9
-};
+// a..g masks derived ONLY from the first bit in each original byte pair.
+// Preserve inherited numeral shapes (including the original9 bottom-bar omission).
+// The raw icon bytes remain in the untouched reference and LegacyPanelDemo.
+const uint8_t kNumeralMasks[10] = {0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7,0x7F,0x67};
+constexpr uint8_t kDigitColumns[7] = {0,1,7,2,3,4,5};
 
 // The original enabled Timer1 even though its active display test does not
 // use the clock values. Keep that setup for this first behavior comparison.
@@ -79,19 +69,18 @@ void clearPanel() {
   }
 }
 
-void showTestNumeral(uint8_t numeral, uint8_t slot) {
-  // A slot is a bit shift used by the source test, not a physical digit index.
-  // The working sketch tests slots 0..7; their visible order needs recording.
-  if (numeral > 9 || slot > 7) return;
+void showTestNumeral(uint8_t numeral, uint8_t digit) {
+  if (numeral > 9 || digit > 6) return;
   delayMicroseconds(1);
   sendCommand(kDisplayMode);
-  sendCommand(0x80);  // Preserve the source's blanking before every frame.
+  sendCommand(0x80);
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   sendBurstByte(0xC0);
-  for (uint8_t i = 0; i < kFrameBytes; ++i) {
-    // The source shifts a wider integer then sends only its low byte.
-    sendBurstByte(uint8_t(uint16_t(kPatterns[numeral][i]) << slot));
+  const uint8_t columnMask = uint8_t(1u << kDigitColumns[digit]);
+  for (uint8_t row = 0; row < 7; ++row) {
+    sendBurstByte((kNumeralMasks[numeral] & (1u << row)) ? columnMask : 0);
+    sendBurstByte(0); // No symbol bits in the second byte.
   }
   digitalWrite(kStrobePin, HIGH);
   sendCommand(kFullBrightness);
@@ -122,10 +111,10 @@ void setup() {
 }
 
 void loop() {
-  // Same visible test as the supplied sketch. This runs immediately on upload.
-  for (uint8_t slot = 0; slot < 8; ++slot)
+  // Physical numeric positions, not raw source slots; symbol groups skipped.
+  for (uint8_t digit = 0; digit < 7; ++digit)
     for (uint8_t numeral = 0; numeral < 10; ++numeral)
-      showTestNumeral(numeral, slot);
+      showTestNumeral(numeral, digit);
   clearPanel();
 }
 
@@ -133,3 +122,4 @@ ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;
 }
+

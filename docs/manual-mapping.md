@@ -28,7 +28,8 @@ column 0 7
 ```
 
 Here, 0 is the raw column and 7 is the numeral to draw. Expect a 7 on the leftmost
-numeric digit. This selection must happen before `n` can advance it.
+numeric digit. This selection must happen before 
+` can advance it.
 
 **Then send:**
 
@@ -36,7 +37,8 @@ numeric digit. This selection must happen before `n` can advance it.
 n
 ```
 
-Repeat `n` once per step. `p` goes back. There is no time limit.
+Repeat 
+` once per step. `p` goes back. There is no time limit.
 Do not type all the steps as one line. Each command needs its own line ending.
 
 | Raw column | Expected with numeral 7 on our panel |
@@ -67,8 +69,10 @@ Send:
 ordered
 ```
 
-Expect a 7 on the leftmost digit. Then `n` moves to the second, third, fourth,
-fifth, sixth and seventh digit. The next `n` wraps to the first. `p` moves back,
+Expect a 7 on the leftmost digit. Then 
+` moves to the second, third, fourth,
+fifth, sixth and seventh digit. The next 
+` wraps to the first. `p` moves back,
 also wrapping. Symbols are skipped. Every result stays lit until changed.
 
 The raw column map is **0, 1, 7, 2, 3, 4, 5** from left to right.
@@ -85,7 +89,7 @@ position, and selected numeral.
 |---|---|
 | `digit 8` | Optional all-bars test after selecting raw, ordered, or slot mode |
 | `digit 7` | Return to the photographed pattern |
-| `slot 0 7` | Compare inherited source slot 0, including its extra symbol bits |
+| `slot 0 7` | Clean raw slot 0 (same result as column 0 7) |
 | `bit 0 0` | Isolate RAM byte 0, bit 0 |
 | `set 0 0 1` | Set that bit within the current frame; use 0 to clear |
 | `frame` | Print all fourteen RAM bytes in hexadecimal |
@@ -97,6 +101,10 @@ position, and selected numeral.
 Slot indices: 0..7; raw columns: 0..15; RAM bytes: 0..13; bits: 0..7; numerals:
 0..9. In single-bit mode n/p walks all 112 storage bits. A custom frame made with
 set has no stepping sequence; select a mode again before n/p.
+
+## Legacy comparison
+
+`legacy-slot 0 7` explicitly reproduces the old mixed digit/icon payload. Normal slot now selects only numeral strokes. column and ordered were already clean. See symbol-bit-correction.md for the byte-level explanation.
 
 ## Troubleshooting and expectations
 
@@ -117,3 +125,4 @@ and the supplied source remain unchanged. ManualMap retains the baseline
 transport and initialization with the explicit D0 serial-input change.
 The latest ordered mode passes compiled Uno UART/GPIO tests; its new physical
 stepping still needs a bench run. Tests do not emulate the panel electrically.
+

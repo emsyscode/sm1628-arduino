@@ -2,9 +2,10 @@
   "name": "sm1628-working-panel-validation",
   "private": true,
   "scripts": {
-    "test": "node tests/compare-avr.cjs build/reference/SM1628B_Panel_DVD_Reader_7digits_sanake_v0.ino.hex build/refactor/PanelDemo.ino.hex"
+    "test": "node tests/compare-avr.cjs build/reference/SM1628B_Panel_DVD_Reader_7digits_sanake_v0.ino.hex build/refactor/LegacyPanelDemo.ino.hex"
   },
   "devDependencies": {
     "avr8js": "0.21.1"
   }
 }
+

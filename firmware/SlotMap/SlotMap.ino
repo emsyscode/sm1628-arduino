@@ -13,7 +13,7 @@ constexpr uint8_t kFrameBytes = 14;
 
 // Literal patterns from the working sketch, including its second-byte bits.
 // Each pair corresponds to a,b,c,d,e,f,g in source order.
-// Do not replace the second bytes with zeros or use a generic numeral font.
+// Second bytes contain legacy icon masks and are NOT sent by this diagnostic.
 const uint8_t kPatterns[10][kFrameBytes] = {
   {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010}, // 0
   {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010}, // 1
@@ -90,8 +90,8 @@ void showTestNumeral(uint8_t numeral, uint8_t slot) {
   delayMicroseconds(1);
   sendBurstByte(0xC0);
   for (uint8_t i = 0; i < kFrameBytes; ++i) {
-    // The source shifts a wider integer then sends only its low byte.
-    sendBurstByte(uint8_t(uint16_t(kPatterns[numeral][i]) << slot));
+    // Only the numeral stroke bit is shifted. Clear all second-byte icon bits.
+    sendBurstByte((i % 2 == 0) ? uint8_t((kPatterns[numeral][i] & 1u) << slot) : 0);
   }
   digitalWrite(kStrobePin, HIGH);
   sendCommand(kFullBrightness);
@@ -133,7 +133,7 @@ void loop() {
     delay(500); // A visible blank separates every labelled pass.
     Serial.print(F("SLOT "));
     Serial.print(slot);
-    Serial.println(F(": showing 8; note numeric position and any symbols."));
+    Serial.println(F(": showing 8, clean raw slot; slot6 intentionally selects symbols."));
     showTestNumeral(8, slot); // Original 100 ms hold is inside this function.
     delay(2900);             // About 3 seconds total per slot.
   }
@@ -145,3 +145,4 @@ ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;
 }
+
