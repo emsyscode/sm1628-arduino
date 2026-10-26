@@ -35,3 +35,7 @@ jobs:
       - run: node tests/panel-snake.cjs build/snake/PanelSnake.ino.hex build/game-checks/GameChecks.ino.hex
       - run: node tests/numeric-demo.cjs build/numeric/PanelDemo.ino.hex
 
+      - name: Compile filming showcase
+        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/showcase firmware/PanelShowcase
+      - run: node tests/panel-showcase.cjs build/showcase/PanelShowcase.ino.hex
+

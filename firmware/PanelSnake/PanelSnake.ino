@@ -1,9 +1,10 @@
 /*
- PanelSnake - FIRST HARDWARE TEST for this salvaged seven-digit SM1628B panel.
+ PanelSnake - joystick Snake with a debounced START button for our SM1628B panel.
  Based on Jose Luis Monteiro's working transport and supplied joystick test.
 
  Uno wiring: D7 DATA, D8 CLK, D9 STB. Joystick signals: A0=X, A1=Y (initial
  assignment to verify); retain the existing tested supply/divider and ground.
+ Start button: A2 to GND, internal pull-up (released HIGH, pressed LOW).
  Z is unused. The legacy setup still drives D1..D13 as outputs: disconnect
  other peripherals there. Optional passive buzzer is disabled below.
 
@@ -15,10 +16,10 @@
  3. Optional: send m to isolate the first digit's top bar. Send n to step
     a,b,c,d,e,f,g on each numeric digit left to right. These assignments still
     need a hardware check. s leaves this test and starts the game.
- 4. Send s, or push the joystick from centre, to start. Food blinks; the
+ 4. Press START (A2 to GND), or send s, to start. Food blinks; the
     snake moves at a fixed speed even when the stick returns to centre.
  5. Collision freezes/blinks the body, then shows approximate GAME / OVER
-    letters and the score. Send s to restart, or centre then push the stick.
+    letters and the score. Release and press START for another round, or send s.
  Serial alternatives: w/a/d/z = up/left/right/down (s is START, not down).
 
  No upload/hardware validation is implied by compilation. Digit order was
@@ -31,6 +32,8 @@
 constexpr uint8_t kDataPin = 7, kClockPin = 8, kStrobePin = 9;
 constexpr uint8_t kDisplayMode = 0x03, kFullBrightness = 0x8F, kFrameBytes = 14;
 constexpr uint8_t kXPin = A0, kYPin = A1;
+constexpr uint8_t kStartPin = A2;
+constexpr unsigned long kButtonDebounceMs = 30;
 constexpr bool kSwapAxes = false, kReverseX = false, kReverseY = false;
 // Default signs follow supplied measurements: left/up raise voltage.
 constexpr int8_t kBuzzerPin = -1; // Optional: set 3 only after wiring a suitable passive buzzer.
@@ -54,7 +57,9 @@ unsigned long calibrationX = 0, calibrationY = 0;
 uint16_t calibrationSamples = 0;
 int rawX = 0, rawY = 0, centreX = 0, centreY = 0;
 SnakeGame::Direction stickDirection = SnakeGame::NONE;
-bool reportInputs = false, restartArmed = false;
+bool reportInputs = false;
+bool buttonRaw = HIGH, buttonStable = HIGH, buttonArmed = false;
+unsigned long buttonChangedAt = 0;
 uint8_t testCell = 0;
 
 void sendCommand(uint8_t value) {
@@ -150,7 +155,7 @@ void draw(unsigned long now) {
 void beginCalibration() {
   phase = CALIBRATING; phaseAt = millis();
   calibrationX = calibrationY = 0; calibrationSamples = 0;
-  stickDirection = SnakeGame::NONE; restartArmed = false;
+  stickDirection = SnakeGame::NONE;
   Serial.println(F("CENTRE joystick now; hold still for one second."));
   draw(phaseAt);
 }
@@ -159,7 +164,7 @@ void startGame() {
     Serial.println(F("Wait for READY; joystick is calibrating.")); return;
   }
   game.reset(uint16_t(random(65536L)));
-  phase = PLAYING; phaseAt = lastMove = millis(); restartArmed = false;
+  phase = PLAYING; phaseAt = lastMove = millis();
   Serial.println(F("PLAY. Food blinks. w/a/d/z also steer; s restarts."));
 }
 void reportDirection(SnakeGame::Direction direction) {
@@ -186,10 +191,10 @@ void readStick(unsigned long now) {
       centreX = calibrationX / calibrationSamples; centreY = calibrationY / calibrationSamples;
       randomSeed(uint32_t(micros()) ^ (uint32_t(rawX) << 16) ^ uint32_t(rawY));
       game.reset(uint16_t(random(65536L)));
-      phase = READY; phaseAt = now; restartArmed = true;
+      phase = READY; phaseAt = now; 
       Serial.print(F("CENTRE X=")); Serial.print(centreX);
       Serial.print(F(" Y=")); Serial.println(centreY);
-      Serial.println(F("READY. Check j input labels. s or a fresh joystick push starts."));
+      Serial.println(F("READY. Check j input labels. Press START or send s to play."));
     }
     return;
   }
@@ -207,15 +212,25 @@ void readStick(unsigned long now) {
     else next = dy > 0 ? SnakeGame::UP : SnakeGame::DOWN;
   }
   stickDirection = next;
-  if (next == SnakeGame::NONE) restartArmed = true;
-  if ((phase == READY || phase == FINISHED) && restartArmed && next != SnakeGame::NONE) {
-    startGame(); game.turn(next);
-  } else if (phase == PLAYING) game.turn(next);
+  if (phase == PLAYING) game.turn(next);
   if (reportInputs && now - lastReport >= 200) {
     lastReport = now;
     Serial.print(F("X=")); Serial.print(rawX); Serial.print(F(" Y=")); Serial.print(rawY);
     Serial.print(F(" dX=")); Serial.print(dx); Serial.print(F(" dY=")); Serial.print(dy);
     Serial.print(' '); reportDirection(next); Serial.println();
+  }
+}
+void readStartButton(unsigned long now) {
+  const bool reading = digitalRead(kStartPin);
+  if (reading != buttonRaw) { buttonRaw = reading; buttonChangedAt = now; }
+  if (now - buttonChangedAt < kButtonDebounceMs || buttonStable == buttonRaw) return;
+  buttonStable = buttonRaw;
+  if (buttonStable == HIGH) buttonArmed = true;
+  else {
+    // One event per press. A held/bouncing button cannot restart a round.
+    const bool accepted = buttonArmed;
+    buttonArmed = false;
+    if (accepted && (phase == READY || phase == FINISHED || phase == BAR_TEST)) startGame();
   }
 }
 void printBar() {
@@ -261,8 +276,12 @@ void setup() {
   DDRD = 0xFF; PORTD = 0; DDRB = 0xFF; PORTB = 0;
   pinMode(0, INPUT); // USB serial RX, as in ManualMap.
   pinMode(kXPin, INPUT); pinMode(kYPin, INPUT); analogReference(DEFAULT);
+  pinMode(kStartPin, INPUT_PULLUP);
+  buttonRaw = buttonStable = digitalRead(kStartPin);
+  buttonArmed = buttonStable == HIGH; // Held at boot: release before first press.
+  buttonChangedAt = millis();
   initializePanel(); clearPanel(); sei();
-  Serial.println(F("PanelSnake FIRST BENCH TEST. A0=X A1=Y; Z unused; optional buzzer disabled by default."));
+  Serial.println(F("PanelSnake FIRST BENCH TEST. A0=X A1=Y START=A2-GND; Z unused; optional buzzer disabled."));
   Serial.println(F("s=start c=calibrate j=inputs m=bar test n=next bar ?=help"));
   beginCalibration();
 }
@@ -270,23 +289,25 @@ void loop() {
   unsigned long now = millis();
   commands();
   now = millis(); // Commands may start a new calibration/time epoch.
-  if (now - lastInput >= kInputMs) { lastInput = now; readStick(now); }
+  if (now - lastInput >= kInputMs) { lastInput = now; readStartButton(now); readStick(now); }
   if (phase == PLAYING && now - lastMove >= kMoveMs) {
     lastMove = now; // No catch-up burst if serial or a frame took longer.
     const SnakeGame::Result result = game.step(uint16_t(random(65536L)));
     if (result == SnakeGame::ATE) {
       Serial.print(F("FOOD score=")); Serial.println(game.score); beep(1400,60);
     } else if (result == SnakeGame::DIED || result == SnakeGame::WON) {
-      phase = DYING; phaseAt = now; restartArmed = false; beep(250,180);
+      phase = DYING; phaseAt = now; beep(250,180);
       Serial.print(result == SnakeGame::WON ? F("BOARD COMPLETE score=") : F("DEAD score="));
       Serial.println(game.score);
     }
   }
   if (phase == DYING && now - phaseAt >= 1600) {
-    phase = FINISHED; phaseAt = now; restartArmed = false;
+    phase = FINISHED; phaseAt = now;
     Serial.print(F("GAME OVER score=")); Serial.println(game.score);
-    Serial.println(F("s to restart, or centre then push joystick."));
+    Serial.println(F("Press START (A2-GND) or send s to restart."));
   }
   if (now - lastDraw >= kDrawMs) { lastDraw = now; draw(now); }
 }
 ISR(TIMER1_COMPA_vect) { ++legacySeconds; legacyFlag = !legacyFlag; }
+
+
