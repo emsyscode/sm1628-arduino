@@ -5,6 +5,8 @@ SM1628B DVD panel**. The driver transport comes from Jose Luis Monteiro's workin
 panel sketch. Game junction/segment rules follow the seven-segment browser
 prototype. The original display tests remain separate and unchanged.
 
+The creator reports the original joystick-controlled game works correctly on the panel. This update adds a START button and removes joystick auto-start; the new button wiring/behavior still needs its hardware test.
+
 ## Wiring and upload
 
 | Signal | Uno pin |
@@ -15,6 +17,7 @@ prototype. The original display tests remain separate and unchanged.
 | Joystick X signal | A0 (initial assignment to verify) |
 | Joystick Y signal | A1 (initial assignment to verify) |
 | Joystick Z | Unused |
+| Momentary START button | A2 to GND; internal pull-up |
 
 Retain the **already tested** display supply, joystick resistor network and
 common ground. This is not a replacement wiring/power schematic. A0/A1 are the
@@ -43,7 +46,7 @@ reset the board.
    Push left, right, up and down. Expect the matching label; release should
    report CENTRE. This mode lets you test the joystick without starting play.
    Send j again to stop reports.
-4. Send **s** to start Snake. Three top bars form the initial snake; blinking
+4. Press the **START button** (or send **s**) to start Snake. Three top bars form the initial snake; blinking
    food appears on a free bar. The snake initially heads right.
 5. Steer before the end. Moving back into the opposite direction is ignored.
    Centring the joystick does not stop the snake. The initial movement period
@@ -52,14 +55,19 @@ reset the board.
    self-collision freezes and blinks the body for about1.6 seconds. The display
    then alternates approximate GAME, OVER and numeric score. Serial prints the
    unambiguous GAME OVER and score. Seven-segment M/V/R are approximations.
-7. Send s to restart. Alternatively, after the game-over screen, centre the
-   joystick and then push it again. A held stick does not immediately restart.
+7. After game over, release and press START for another round. Serial s also works. Joystick movement no longer starts/restarts the game. Holding the button does not restart it repeatedly.
 
 The game treats each illuminated bar as one cell (49 total), and each endpoint
 as a junction. Horizontal gaps between digits are crossed without becoming body
 or food cells. Turns must follow a real segment; the layout is deliberately
 restrictive, just as in the browser prototype. Filling all 49 cells ends the round
 and reports BOARD COMPLETE before the end sequence.
+
+## START button
+
+Use a normally open momentary button between A2 and GND. INPUT_PULLUP holds the input HIGH when released; a press connects it to GND (LOW). No extra pull-up resistor is required for this input. A2 is separate from the inherited D1..D13 output bank. On a four-leg tactile button, use contacts that are open when released and joined only when pressed.
+
+The code requires 30ms of stable input and one new press. Holding at startup requires release before pressing to start. A press during play does not reset the round; after GAME OVER, a fresh press starts again. The button can also leave the bar test and start play. Calibration must finish first. Serial s remains available.
 
 ## Quick controls
 
@@ -120,8 +128,9 @@ Integration checks cover the supplied voltage directions, calibration, all 49
 isolated bar payloads, death blink, game over, restart and exclusion of symbol
 columns. These are not electrical/optical panel tests.
 
-The new combined sketch has **not yet been run on your actual hardware**.
+The new button-equipped sketch has **not yet been run on your actual hardware**; the earlier joystick-controlled game was reported working.
 Check direction labels and bar assignments before judging gameplay/readability.
 If the display stays blank, report startup output; if controls are wrong, report
 j values at centre and each direction. Keep working PanelDemo/ManualMap for
 comparison. No driver-wide compatibility or final production firmware is claimed.
+
