@@ -1,0 +1,10 @@
+{
+  "name": "sm1628-arduino-validation",
+  "private": true,
+  "scripts": {
+    "test:avr": "node tests/protocol.cjs build/protocol/ProtocolTest.ino.hex && node tests/panel.cjs build/panel/PanelTest.ino.hex && node tests/minimal.cjs build/minimal/Minimal.ino.hex"
+  },
+  "devDependencies": {
+    "avr8js": "0.21.1"
+  }
+}

@@ -1,0 +1,28 @@
+name: Validate library
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  uno:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: arduino-cli core update-index
+      - run: arduino-cli core install arduino:avr@1.8.6
+      - name: Compile examples with bench output disabled
+        run: |
+          for name in Minimal RawFrame SegmentWalk BufferedCounter; do
+            arduino-cli compile --fqbn arduino:avr:uno --library . "examples/$name"
+          done
+      - name: Compile active examples and test fixtures
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno --build-property "compiler.cpp.extra_flags=-DSM1628_BENCH_READY=1" --build-path build/minimal examples/Minimal
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-property "compiler.cpp.extra_flags=-DSM1628_BENCH_READY=1" --build-path build/counter examples/BufferedCounter
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/protocol tests/ProtocolTest
+          arduino-cli compile --fqbn arduino:avr:uno --library . --build-path build/panel tests/PanelTest
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run test:avr
