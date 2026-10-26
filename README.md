@@ -24,6 +24,13 @@ branches. The original Timer1/register setup is retained and explained.
 **The original was reported working by the creator. The refactor still needs
 their hardware retest.** Compile/AVR comparisons do not substitute for that test.
 
+## Identify the actual output order
+
+Use [firmware/SlotMap/SlotMap.ino](firmware/SlotMap/SlotMap.ino) for one labelled,
+non-repeating mapping pass. It shows the source 8 pattern for about three seconds
+per slot and prints SLOT 0..7 at 9600 baud. Record numeric digits and symbols
+separately. [Instructions and recording table](docs/slot-mapping.md).
+
 ## Reference and explanation
 
 - [Untouched supplied sketch](reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0/SM1628B_Panel_DVD_Reader_7digits_sanake_v0.ino).

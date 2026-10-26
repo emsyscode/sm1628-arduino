@@ -17,5 +17,7 @@ jobs:
         run: |
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/reference reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor firmware/PanelDemo
+      - name: Compile one-pass mapping diagnostic
+        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/slot-map firmware/SlotMap
       - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm test
