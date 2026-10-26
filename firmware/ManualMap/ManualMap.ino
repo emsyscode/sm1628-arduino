@@ -1,4 +1,25 @@
-// Interactive diagnostic derived from the user-tested PanelDemo.
+/*
+ ManualMap - interactive Uno diagnostic, based on Jose Luis Monteiro's panel test.
+
+ HOW TO USE
+ 1. Use the tested panel wiring: D7 DATA, D8 CLK, D9 STB, common ground.
+    Keep the tested supply arrangement. D1..D13 retain legacy output setup:
+    disconnect joystick/other peripherals on those pins. D0 is serial input.
+ 2. Upload for Arduino Uno. Open Serial Monitor: 9600 baud, Newline (or Both).
+ 3. It starts BLANK. First send: column 0 7
+    Expect a 7 on the LEFTMOST numeric digit of this particular panel.
+ 4. Then send n (next) or p (previous). Each selection holds until changed.
+    Raw column order is NOT physical digit order; it also reaches symbols.
+ 5. For digits left to right, send: ordered
+    This starts a fresh sequence with numeral 7, using the photo-derived map.
+    n/p now steps only the seven numeric positions; it wraps at each end.
+    Send column 0 7 to return to the original raw-column diagnostic.
+
+ WHY 7? It matches the photographed mapping test (top + two right bars).
+ digit 8 is an optional all-bars check AFTER selecting a mode; it is not
+ evidence that all bars are already verified. Other panels need their own map.
+ See docs/manual-mapping.md for expected results and troubleshooting.
+*/
 // Changes are limited to manual frame selection, serial RX and command parsing.
 // PanelDemo and the untouched original remain separate hardware references.
 #include <Arduino.h>
@@ -82,10 +103,13 @@ void clearPanel() {
 }
 
 // Manual state: no automatic test loop and no heap allocation.
-enum Selection { NONE, SLOT, COLUMN, SINGLE_BIT, CUSTOM };
+// Photo-derived numeric positions, left to right; not engineer Grid labels.
+constexpr uint8_t kDigitColumns[] = {0, 1, 7, 2, 3, 4, 5};
+constexpr uint8_t kDigitCount = sizeof(kDigitColumns);
+enum Selection { NONE, SLOT, COLUMN, ORDERED, SINGLE_BIT, CUSTOM };
 Selection selected = NONE;
 uint8_t selectedIndex = 0;
-uint8_t numeral = 8;
+uint8_t numeral = 7;
 uint8_t frame[kFrameBytes] = {0};
 char line[48];
 uint8_t lineLength = 0;
@@ -113,12 +137,31 @@ void printStatus() {
   switch (selected) {
     case SLOT: Serial.print(F("original-slot")); break;
     case COLUMN: Serial.print(F("raw-column")); break;
+    case ORDERED: Serial.print(F("ordered-digits")); break;
     case SINGLE_BIT: Serial.print(F("single-bit")); break;
     case CUSTOM: Serial.print(F("custom-frame")); break;
     default: Serial.print(F("blank")); break;
   }
   Serial.print(F(" index=")); Serial.print(selectedIndex);
   Serial.print(F(" numeral=")); Serial.println(numeral);
+  if (selected == COLUMN || selected == ORDERED) {
+    const uint8_t column = selected == ORDERED ? kDigitColumns[selectedIndex] : selectedIndex;
+    Serial.print(F("Raw column ")); Serial.print(column);
+    Serial.print(F(": expected on this panel: "));
+    int8_t position = -1;
+    for (uint8_t i = 0; i < kDigitCount; ++i)
+      if (kDigitColumns[i] == column) position = i;
+    if (position >= 0) {
+      Serial.print(F("numeric position ")); Serial.print(position + 1);
+      Serial.print(F(" from left, numeral ")); Serial.println(numeral);
+    } else if (column == 6) {
+      Serial.println(F("return/colons/Dolby/DTS group (lit icons depend on numeral)."));
+    } else if (column == 8) {
+      Serial.println(F("wheel group (lit wedges depend on numeral)."));
+    } else if (column == 9) {
+      Serial.println(F("DVD/VCD/MP3/playback group (lit icons depend on numeral)."));
+    } else Serial.println(F("unmapped storage column; no visible result established."));
+  }
 }
 
 void printFrame() {
@@ -133,9 +176,12 @@ void printFrame() {
 
 void printHelp() {
   Serial.println(F("Manual panel diagnostic - 9600 baud, Newline or Both."));
+  Serial.println(F("START: column 0 7 -> leftmost digit shows 7. THEN send n."));
+  Serial.println(F("ordered      Start left-to-right numeric test with 7; n/p steps."));
+  Serial.println(F("n/p need a selection first; clear/reset removes it."));
   Serial.println(F("slot N [D]   Original slot 0..7, optional numeral 0..9."));
   Serial.println(F("column C [D] Raw column 0..15, no extra symbol bits."));
-  Serial.println(F("digit D      Change numeral on selected slot/column."));
+  Serial.println(F("digit D      Change numeral on selected slot/column/ordered mode."));
   Serial.println(F("bit B I      Isolate RAM byte B (0..13), bit I (0..7)."));
   Serial.println(F("set B I V    Edit one current RAM bit; V=0 or 1."));
   Serial.println(F("next / n     Next slot, raw column or isolated bit."));
@@ -152,12 +198,13 @@ void renderSelection() {
     // Exact original masks, including second-byte symbol bits.
     for (uint8_t i = 0; i < kFrameBytes; ++i)
       frame[i] = uint8_t(uint16_t(kPatterns[numeral][i]) << selectedIndex);
-  } else if (selected == COLUMN) {
+  } else if (selected == COLUMN || selected == ORDERED) {
     // Same a..g numeral shape, but only ONE raw column is selected.
     // 0..7 = first byte of each pair; 8..15 = second byte.
     // The range describes RAM storage, not sixteen supported physical digits.
-    const uint8_t byteOffset = selectedIndex / 8;
-    const uint8_t mask = uint8_t(1u << (selectedIndex % 8));
+    const uint8_t column = selected == ORDERED ? kDigitColumns[selectedIndex] : selectedIndex;
+    const uint8_t byteOffset = column / 8;
+    const uint8_t mask = uint8_t(1u << (column % 8));
     for (uint8_t row = 0; row < 7; ++row)
       if (kPatterns[numeral][row * 2] & 1) frame[row * 2 + byteOffset] = mask;
   } else if (selected == SINGLE_BIT) {
@@ -187,8 +234,12 @@ void moveSelection(int8_t direction) {
   uint8_t count = 0;
   if (selected == SLOT) count = 8;
   if (selected == COLUMN) count = 16;
+  if (selected == ORDERED) count = kDigitCount;
   if (selected == SINGLE_BIT) count = 112;
-  if (count == 0) { commandError(); return; }
+  if (count == 0) {
+    Serial.println(F("No sequence selected. First send column 0 7, or ordered; then n/p."));
+    return;
+  }
   selectedIndex = uint8_t((int(selectedIndex) + count + direction) % count);
   renderSelection();
 }
@@ -206,6 +257,11 @@ void executeLine() {
   for (char* p = args[0]; *p; ++p) *p = char(tolower(uint8_t(*p)));
 
   uint8_t index = 0, value = numeral, bit = 0;
+  if (!strcmp(args[0], "ordered")) {
+    if (count != 1) { commandError(); return; }
+    selected = ORDERED; selectedIndex = 0; numeral = 7;
+    renderSelection(); return;
+  }
   if (!strcmp(args[0], "slot") || !strcmp(args[0], "column")) {
     const bool original = !strcmp(args[0], "slot");
     if ((count != 2 && count != 3) ||
@@ -218,7 +274,7 @@ void executeLine() {
     renderSelection(); return;
   }
   if (!strcmp(args[0], "digit")) {
-    if (count != 2 || (selected != SLOT && selected != COLUMN) ||
+    if (count != 2 || (selected != SLOT && selected != COLUMN && selected != ORDERED) ||
         !readNumber(args[1], 9, value)) { commandError(); return; }
     numeral = value; renderSelection(); return;
   }
@@ -286,7 +342,7 @@ void setup() {
   clearPanel();
   sei();
   printHelp();
-  Serial.println(F("READY. Blank display; send a command. No automatic stepping."));
+  Serial.println(F("READY. Blank display. First: column 0 7. Then: n. Or start: ordered."));
 }
 
 void loop() {
@@ -307,3 +363,4 @@ ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;
 }
+

@@ -30,7 +30,14 @@ Our implementation sends complete fourteen-byte frames to update the display.
 The chip protocol also supports addressed writes; full frames are our mapping
 and update strategy, not a claim that every partial protocol write is invalid.
 
-**Still to measure:** correlation between these engineer Grid labels and our
-raw RAM columns/source shift slots, plus individual segment/icon assignments.
-Do not silently subtract one from Grid labels to make a firmware mapping.
-Use [the manual diagnostic](manual-mapping.md) to record that correlation.
+## Photographed raw-column correlation — 2026-10-26
+
+Creator ran column 0 7 followed by one n per photo. Observed numeric digits
+left to right use raw columns **0,1,7,2,3,4,5**. These correspond by physical
+position to the engineer Grid labels above; do not derive one by subtracting one.
+Raw6 lit return/both colons, raw8 three wheel wedges, raw9 DVD/VCD/MP3.
+The 7 pattern confirms the numeric positions and three bars, not all bars/icons.
+
+ManualMap now offers ordered mode using this map. Its new ordered stepping
+still needs a hardware run; raw-column selection has the photo evidence.
+[Instructions, expected outputs and troubleshooting](manual-mapping.md).
