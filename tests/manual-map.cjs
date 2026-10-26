@@ -25,10 +25,20 @@ function run(ms){const end=cpu.cycles+ms*16000;while(cpu.cycles<end){avr.avrInst
 function command(text){for(const ch of text+'\n'){assert(uart.writeByte(ch.charCodeAt(0)));run(1.3);}run(200);}
 run(2200);assert(output.includes('READY.'));assert.equal(packets.length,32);
 assert.equal(cpu.data[0x2A],254,'only D0 restored to input');assert.equal(cpu.data[0x24],255);
+command('n'); assert(output.includes('First send column 0 7')); assert.equal(packets.length,32);
 const expectFrame=(cmd,frame)=>{
  const before=packets.length;command(cmd);
  assert.deepEqual(packets.slice(before),[[3],[128],[192,...frame],[143]],cmd);
 };
+const seven=c=>Array.from({length:14},(_,i)=>i%2===0 && i<=4 ? (1<<c) : 0);
+expectFrame('column 0 7',seven(0));
+assert(output.includes('numeric position 1 from left, numeral 7'));
+expectFrame('n',seven(1));
+expectFrame('ordered',seven(0));
+for(const c of [1,7,2,3,4,5,0])expectFrame('n',seven(c));
+expectFrame('p',seven(5));
+expectFrame('digit 8',Array.from({length:14},(_,i)=>i%2===0?32:0));
+expectFrame('ordered',seven(0)); // restart restores 7 and leftmost position
 let f=Array(14).fill(0);
 expectFrame('column 0 8',f.map((_,i)=>i%2===0?1:0));
 expectFrame('column 8 8',f.map((_,i)=>i%2===1?1:0));
@@ -42,8 +52,10 @@ const before=packets.length;
 for(const cmd of ['slot 8','column 16','bit 14 0','bit 0 8','set 0 0 2','slot -1','slot 0 8 extra','x'.repeat(70),'digit 2','next'])
  command(cmd);
 assert.equal(packets.length,before,'invalid commands must not mutate display');
-assert.equal((output.match(/ERR:/g)||[]).length,10);
+assert.equal((output.match(/ERR:/g)||[]).length,9);
+assert.equal((output.match(/No sequence selected/g)||[]).length,2);
 expectFrame('clear',Array(14).fill(0));
 command('frame');assert(output.includes('RAM 00..0D: '+Array(14).fill('00').join(' ')));
 const held=packets.length;run(1000);assert.equal(packets.length,held,'no automatic stepping');
 console.log('PASS: compiled Uno UART commands, full frames, bit stepping, invalid inputs, RX direction and indefinite hold.');
+
