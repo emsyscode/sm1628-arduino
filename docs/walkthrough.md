@@ -1,3 +1,5 @@
+CURRENT ROUTING (2026-10-26): the exact former PanelDemo described in this historical baseline record is now firmware/LegacyPanelDemo. The new PanelDemo is a numeric-only physical-order test. See docs/symbol-bit-correction.md for the deliberate correction and new checks. The original refactor was subsequently reported working by the creator; the latest corrected numeric renderer still needs a hardware run.
+
 # Reading the clean sketch
 
 ## The three wires
@@ -36,3 +38,4 @@ we add joystick reading, a segment API and hardware Snake.
 
 The display is already built into its panel. Its manufacturer chose the wiring;
 we are documenting and adapting that wiring, not choosing it ourselves.
+

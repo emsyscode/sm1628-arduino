@@ -13,10 +13,11 @@ jobs:
           node-version: '22'
       - run: arduino-cli core update-index
       - run: arduino-cli core install arduino:avr@1.8.6
-      - name: Compile untouched reference and clean candidate
+      - name: Compile untouched reference, legacy comparison and numeric-only demo
         run: |
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/reference reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0
-          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor firmware/PanelDemo
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor firmware/LegacyPanelDemo
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/numeric firmware/PanelDemo
       - name: Compile one-pass mapping diagnostic
         run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/slot-map firmware/SlotMap
       - name: Compile manual mapping diagnostic
@@ -32,3 +33,5 @@ jobs:
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/game-checks tests/GameChecks
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/joystick firmware/JoystickTest
       - run: node tests/panel-snake.cjs build/snake/PanelSnake.ino.hex build/game-checks/GameChecks.ino.hex
+      - run: node tests/numeric-demo.cjs build/numeric/PanelDemo.ino.hex
+

@@ -10,7 +10,9 @@
     Expect a 7 on the LEFTMOST numeric digit of this particular panel.
  4. Then send n (next) or p (previous). Each selection holds until changed.
     Raw column order is NOT physical digit order; it also reaches symbols.
- 5. For digits left to right, send: ordered
+ 5. slot N D is now clean. legacy-slot N D explicitly reproduces the old
+    digit+symbol payload. column 0 7 and ordered already used clean frames.
+ 6. For digits left to right, send: ordered
     This starts a fresh sequence with numeral 7, using the photo-derived map.
     n/p now steps only the seven numeric positions; it wraps at each end.
     Send column 0 7 to return to the original raw-column diagnostic.
@@ -21,7 +23,7 @@
  See docs/manual-mapping.md for expected results and troubleshooting.
 */
 // Changes are limited to manual frame selection, serial RX and command parsing.
-// PanelDemo and the untouched original remain separate hardware references.
+// LegacyPanelDemo and the untouched original remain exact behavior references.
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <ctype.h>
@@ -34,10 +36,12 @@ constexpr uint8_t kDisplayMode = 0x03;
 constexpr uint8_t kFullBrightness = 0x8F;
 constexpr uint8_t kFrameBytes = 14;
 
-// Literal patterns from the working sketch, including its second-byte bits.
+// LEGACY payloads: second bytes include icon bits, not pure numeral strokes.
+// Normal slot/column/ordered extract only the first-bit a..g shape.
+// Only the explicit legacy-slot command transmits both inherited bytes.
 // Each pair corresponds to a,b,c,d,e,f,g in source order.
 // Do not replace the second bytes with zeros or use a generic numeral font.
-const uint8_t kPatterns[10][kFrameBytes] = {
+const uint8_t kLegacyPatterns[10][kFrameBytes] = {
   {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010}, // 0
   {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010}, // 1
   {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010}, // 2
@@ -106,7 +110,7 @@ void clearPanel() {
 // Photo-derived numeric positions, left to right; not engineer Grid labels.
 constexpr uint8_t kDigitColumns[] = {0, 1, 7, 2, 3, 4, 5};
 constexpr uint8_t kDigitCount = sizeof(kDigitColumns);
-enum Selection { NONE, SLOT, COLUMN, ORDERED, SINGLE_BIT, CUSTOM };
+enum Selection { NONE, SLOT, LEGACY_SLOT, COLUMN, ORDERED, SINGLE_BIT, CUSTOM };
 Selection selected = NONE;
 uint8_t selectedIndex = 0;
 uint8_t numeral = 7;
@@ -135,7 +139,8 @@ void zeroFrame() {
 void printStatus() {
   Serial.print(F("mode="));
   switch (selected) {
-    case SLOT: Serial.print(F("original-slot")); break;
+    case SLOT: Serial.print(F("raw-slot-clean")); break;
+    case LEGACY_SLOT: Serial.print(F("LEGACY-digit-plus-icon")); break;
     case COLUMN: Serial.print(F("raw-column")); break;
     case ORDERED: Serial.print(F("ordered-digits")); break;
     case SINGLE_BIT: Serial.print(F("single-bit")); break;
@@ -144,7 +149,7 @@ void printStatus() {
   }
   Serial.print(F(" index=")); Serial.print(selectedIndex);
   Serial.print(F(" numeral=")); Serial.println(numeral);
-  if (selected == COLUMN || selected == ORDERED) {
+  if (selected == SLOT || selected == COLUMN || selected == ORDERED) {
     const uint8_t column = selected == ORDERED ? kDigitColumns[selectedIndex] : selectedIndex;
     Serial.print(F("Raw column ")); Serial.print(column);
     Serial.print(F(": expected on this panel: "));
@@ -179,7 +184,8 @@ void printHelp() {
   Serial.println(F("START: column 0 7 -> leftmost digit shows 7. THEN send n."));
   Serial.println(F("ordered      Start left-to-right numeric test with 7; n/p steps."));
   Serial.println(F("n/p need a selection first; clear/reset removes it."));
-  Serial.println(F("slot N [D]   Original slot 0..7, optional numeral 0..9."));
+  Serial.println(F("slot N [D]   Clean raw column 0..7; numeral 0..9."));
+  Serial.println(F("legacy-slot N [D] Reproduce old digit+icon payload (intentional)."));
   Serial.println(F("column C [D] Raw column 0..15, no extra symbol bits."));
   Serial.println(F("digit D      Change numeral on selected slot/column/ordered mode."));
   Serial.println(F("bit B I      Isolate RAM byte B (0..13), bit I (0..7)."));
@@ -194,11 +200,11 @@ void printHelp() {
 
 void renderSelection() {
   zeroFrame();
-  if (selected == SLOT) {
-    // Exact original masks, including second-byte symbol bits.
+  if (selected == LEGACY_SLOT) {
+    // Explicit reproduction ONLY: original masks, including second-byte symbol bits.
     for (uint8_t i = 0; i < kFrameBytes; ++i)
-      frame[i] = uint8_t(uint16_t(kPatterns[numeral][i]) << selectedIndex);
-  } else if (selected == COLUMN || selected == ORDERED) {
+      frame[i] = uint8_t(uint16_t(kLegacyPatterns[numeral][i]) << selectedIndex);
+  } else if (selected == SLOT || selected == COLUMN || selected == ORDERED) {
     // Same a..g numeral shape, but only ONE raw column is selected.
     // 0..7 = first byte of each pair; 8..15 = second byte.
     // The range describes RAM storage, not sixteen supported physical digits.
@@ -206,7 +212,7 @@ void renderSelection() {
     const uint8_t byteOffset = column / 8;
     const uint8_t mask = uint8_t(1u << (column % 8));
     for (uint8_t row = 0; row < 7; ++row)
-      if (kPatterns[numeral][row * 2] & 1) frame[row * 2 + byteOffset] = mask;
+      if (kLegacyPatterns[numeral][row * 2] & 1) frame[row * 2 + byteOffset] = mask;
   } else if (selected == SINGLE_BIT) {
     frame[selectedIndex / 8] = uint8_t(1u << (selectedIndex % 8));
   }
@@ -232,7 +238,7 @@ void commandError() {
 
 void moveSelection(int8_t direction) {
   uint8_t count = 0;
-  if (selected == SLOT) count = 8;
+  if (selected == SLOT || selected == LEGACY_SLOT) count = 8;
   if (selected == COLUMN) count = 16;
   if (selected == ORDERED) count = kDigitCount;
   if (selected == SINGLE_BIT) count = 112;
@@ -262,19 +268,21 @@ void executeLine() {
     selected = ORDERED; selectedIndex = 0; numeral = 7;
     renderSelection(); return;
   }
-  if (!strcmp(args[0], "slot") || !strcmp(args[0], "column")) {
-    const bool original = !strcmp(args[0], "slot");
+  if (!strcmp(args[0], "slot") || !strcmp(args[0], "column") ||
+      !strcmp(args[0], "legacy-slot")) {
+    const bool columnMode = !strcmp(args[0], "column");
+    const bool legacyMode = !strcmp(args[0], "legacy-slot");
     if ((count != 2 && count != 3) ||
-        !readNumber(args[1], original ? 7 : 15, index) ||
+        !readNumber(args[1], columnMode ? 15 : 7, index) ||
         (count == 3 && !readNumber(args[2], 9, value))) {
       commandError(); return;
     }
-    selected = original ? SLOT : COLUMN;
+    selected = legacyMode ? LEGACY_SLOT : (columnMode ? COLUMN : SLOT);
     selectedIndex = index; numeral = value;
     renderSelection(); return;
   }
   if (!strcmp(args[0], "digit")) {
-    if (count != 2 || (selected != SLOT && selected != COLUMN && selected != ORDERED) ||
+    if (count != 2 || (selected != SLOT && selected != LEGACY_SLOT && selected != COLUMN && selected != ORDERED) ||
         !readNumber(args[1], 9, value)) { commandError(); return; }
     numeral = value; renderSelection(); return;
   }
@@ -363,4 +371,5 @@ ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;
 }
+
 
