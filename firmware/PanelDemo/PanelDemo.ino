@@ -14,8 +14,8 @@ constexpr uint8_t kFrameBytes = 14;
 // a..g masks derived ONLY from the first bit in each original byte pair.
 // Preserve inherited numeral shapes (including the original9 bottom-bar omission).
 // The raw icon bytes remain in the untouched reference and LegacyPanelDemo.
-const uint8_t kNumeralMasks[10] = {0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7,0x7F,0x67};
-constexpr uint8_t kDigitColumns[7] = {0,1,7,2,3,4,5};
+const uint8_t kNumeralMasks[10] = {0x3F, 0x6, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x67};
+constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
 
 // The original enabled Timer1 even though its active display test does not
 // use the clock values. Keep that setup for this first behavior comparison.
@@ -50,10 +50,14 @@ void sendBurstByte(uint8_t value) {
 
 void initializePanel() {
   delayMicroseconds(200);
-  sendCommand(kDisplayMode); delayMicroseconds(1);
-  sendCommand(0x40);         delayMicroseconds(1);
-  sendCommand(0xC0);         delayMicroseconds(1);
-  sendCommand(kFullBrightness); delayMicroseconds(1);
+  sendCommand(kDisplayMode);
+  delayMicroseconds(1);
+  sendCommand(0x40);
+  delayMicroseconds(1);
+  sendCommand(0xC0);
+  delayMicroseconds(1);
+  sendCommand(kFullBrightness);
+  delayMicroseconds(1);
 }
 
 void clearPanel() {
@@ -70,7 +74,8 @@ void clearPanel() {
 }
 
 void showTestNumeral(uint8_t numeral, uint8_t digit) {
-  if (numeral > 9 || digit > 6) return;
+  if (numeral > 9 || digit > 6)
+    return;
   delayMicroseconds(1);
   sendCommand(kDisplayMode);
   sendCommand(0x80);
@@ -80,7 +85,7 @@ void showTestNumeral(uint8_t numeral, uint8_t digit) {
   const uint8_t columnMask = uint8_t(1u << kDigitColumns[digit]);
   for (uint8_t row = 0; row < 7; ++row) {
     sendBurstByte((kNumeralMasks[numeral] & (1u << row)) ? columnMask : 0);
-    sendBurstByte(0); // No symbol bits in the second byte.
+    sendBurstByte(0);  // No symbol bits in the second byte.
   }
   digitalWrite(kStrobePin, HIGH);
   sendCommand(kFullBrightness);
@@ -101,10 +106,11 @@ void setup() {
 
   // Compatibility setup retained exactly from the user-tested sketch.
   // It takes ownership of ALL Uno D0..D13 pins; disconnect other peripherals.
-  // Narrowing this to three pinMode calls requires a separate bench test.
   CLKPR = 0x80;
-  DDRD = 0xFF; PORTD = 0;
-  DDRB = 0xFF; PORTB = 0;
+  DDRD = 0xFF;
+  PORTD = 0;
+  DDRB = 0xFF;
+  PORTB = 0;
   initializePanel();
   clearPanel();
   sei();

@@ -37,4 +37,7 @@ assert(!loopOutput.includes('DEMO DONE.'));
 assert((loopOutput.match(/effect=off step=0/g)||[]).length>=3,'loop wraps through final blank and new pre-roll');
 send('stop');frame([],'loop cancelled');const stopped=m.frames.length;m.run(2000);assert.equal(m.frames.length,stopped);
 for(const f of m.frames)for(let row=0;row<7;row++)assert.equal(f.data[row*2+1]&252,0,'no undefined columns10..15');
+assert.equal(m.cpu.data[0x2A]&16,0,'D4 remains input during filming');
+assert.equal(m.buzzerEdges.filter(e=>e.on).length,0,'D11 stays silent during filming');
 console.log('PASS: numeric/all-group sweeps, all-on/off, blink, sync count, carry/overflow, seeded effects, freeze/stop, invalid commands, bounded full demo and repeated sequence.');
+

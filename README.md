@@ -11,8 +11,8 @@ panel and remain archived. The creator confirmed the earlier refactor works; it 
 Uno: panel D7/D8/D9, joystick signals A0/A1. Keep the tested supply/divider.
 Serial Monitor 115200: hold joystick centred for calibration, then m to check
 bars, j to check input directions, then START or serial s to play. Read the guide before upload.
-Optional beeps are disabled until a buzzer connection is confirmed.
-Creator confirms the joystick-controlled game works on hardware. START is now a button between A2 and GND (internal pull-up); joystick no longer starts rounds. This button update awaits hardware testing.
+Sound is enabled on D11; see the game guide for buzzer settings.
+Creator confirms the joystick-controlled game works on hardware. START is now a button between D4 and GND (internal pull-up); joystick no longer starts rounds. This button update awaits hardware testing.
 The cleaned standalone [joystick reader](firmware/JoystickTest/JoystickTest.ino)
 is also included (115200 baud, readings every 500 ms).
 
