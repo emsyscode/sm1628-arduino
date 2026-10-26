@@ -19,5 +19,10 @@ jobs:
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor firmware/PanelDemo
       - name: Compile one-pass mapping diagnostic
         run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/slot-map firmware/SlotMap
+      - name: Compile manual mapping diagnostic
+        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/manual firmware/ManualMap
       - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm test
+
+      - run: node tests/manual-map.cjs build/manual/ManualMap.ino.hex
+

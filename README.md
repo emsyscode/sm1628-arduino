@@ -1,48 +1,40 @@
 # SM1628 panel — working-source baseline
 
-This repository has been reset around the **new sketch reported working by the
-creator on the actual salvaged panel**. Earlier generated driver examples failed
-on that hardware and are retired from the active project.
+Based on Jose Luis Monteiro's original sketch, preserved byte-for-byte under
+reference/WorkingPanel. Earlier generated examples failed on this salvaged
+panel and remain archived. The creator confirms the clean PanelDemo now works.
 
-## Start here
+## Map the panel manually
 
-Open [firmware/PanelDemo/PanelDemo.ino](firmware/PanelDemo/PanelDemo.ino) in Arduino
-IDE, select **Arduino Uno**, and compile/upload using the existing tested wiring.
-It runs the original repeating numeral test immediately: there is no enable flag.
+Open [firmware/ManualMap/ManualMap.ino](firmware/ManualMap/ManualMap.ino)
+in Arduino IDE, select Arduino Uno and upload with the tested wiring.
+Open Serial Monitor at **9600 baud**, with **Newline** or **Both NL & CR**.
 
-- Arduino D7: DATA; D8: CLK; D9: STB.
-- These are Arduino GPIO assignments, not panel connector pin numbers.
-- The retained setup also configures all D0..D13 as outputs. It is Uno-specific.
-  Do not attach a joystick or other peripherals to those pins yet.
-- Keep the power/wiring arrangement already used for the working original.
+Send `column 0 8`, then `next` when ready. Each selection stays lit until
+another command. Use `slot 0 8` to compare the original pattern, or `bit 0 0`
+to isolate a single RAM bit. [All commands and recording instructions](docs/manual-mapping.md).
 
-The clean sketch preserves the active sender timings, startup, full brightness,
-fourteen-byte patterns, source slot order, per-frame blanking and clear sequence.
-It removes the unused clock application, key reader and repeated numeral switch
-branches. The original Timer1/register setup is retained and explained.
+Arduino D7 = DATA, D8 = CLK, D9 = STB; these are GPIO assignments, not connector pins.
+The inherited setup owns D1..D13 as outputs; ManualMap restores D0 to input
+for serial reception. Do not add joystick/peripheral connections to those pins.
+Keep the existing tested supply arrangement.
 
-**The original was reported working by the creator. The refactor still needs
-their hardware retest.** Compile/AVR comparisons do not substitute for that test.
+## Other tests and references
 
-## Identify the actual output order
+- [PanelDemo](firmware/PanelDemo/PanelDemo.ino): unchanged repeating original test.
+- [SlotMap](firmware/SlotMap/SlotMap.ino): earlier timed, one-pass diagnostic.
+- [Engineer panel map](docs/panel-map.md): numeric digits left to right are
+  **Grid 6, 8, 7, 5, 4, 3, 2**, plus three symbol groups.
+- [Original Portuguese explanation](docs/engineer-panel-explanation.pt.md).
+- [Datasheet sources and revisions](docs/datasheets.md).
+- [Baseline details](docs/baseline.md), [walkthrough](docs/walkthrough.md),
+  [validation](docs/validation.md), [earlier code archive](archive/README.md).
 
-Use [firmware/SlotMap/SlotMap.ino](firmware/SlotMap/SlotMap.ino) for one labelled,
-non-repeating mapping pass. It shows the source 8 pattern for about three seconds
-per slot and prints SLOT 0..7 at 9600 baud. Record numeric digits and symbols
-separately. [Instructions and recording table](docs/slot-mapping.md).
+Raw RAM columns and source slots are separate indices from the engineer's
+Grid labels. Their correlation still needs recording on the actual panel.
+ManualMap compiles and passes simulated UART/GPIO checks; its hardware test
+is pending. It does not modify the accepted PanelDemo.
 
-## Reference and explanation
-
-- [Untouched supplied sketch](reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0/SM1628B_Panel_DVD_Reader_7digits_sanake_v0.ino).
-- [What is retained and why](docs/baseline.md).
-- [How the test works](docs/walkthrough.md).
-- [Validation and next bench comparison](docs/validation.md).
-- [Why earlier code was retired](archive/README.md).
-
-This baseline is a display test, **not Snake firmware**, despite the supplied
-filename. The reported numeric order is 3,1,2,4,5,6,7 from the left; it is not yet a verified slot-to-digit map. See [panel observations](docs/panel-observations.md).
-The Snake computer prototype, joystick animations and script remain in the
-existing project/production repositories.
-
-Based on Jose Luis Monteiro's work. No public release or new distribution license
-is claimed by this private development repository.
+This is display-test firmware, not yet the Snake game. The computer prototype,
+joystick animations and video script remain in the existing project repos.
+No public release or new distribution license is claimed by this private repo.
