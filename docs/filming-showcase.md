@@ -2,7 +2,7 @@
 
 This standalone Uno sketch provides controllable demonstration footage for the
 SM1628/SM1628B video. It uses our salvaged panel's numeric map and the inherited
-tested transport. It is a demonstration, not Snake gameplay. It can run each
+tested transport. It includes display demonstrations and a scripted Snake replay. It can run each
 effect separately or a complete repeatable sequence.
 
 ## Connect and start
@@ -12,7 +12,7 @@ effect separately or a complete repeatable sequence.
 2. The legacy setup drives D1..D13, except D4, as outputs; keep other peripherals off those
    pins. D0 is restored as serial RX. Joystick signals A0/A1 and START on D4
    are not read by this sketch; D4 remains an input with pull-up and D11 buzzer stays LOW/silent. The game is in PanelSnake.
-3. Open firmware/PanelShowcase/PanelShowcase.ino, select Arduino Uno and upload.
+3. Open firmware/PanelShowcase/PanelShowcase.ino with SnakeReplay.h and SnakeGame.h beside it, select Arduino Uno and upload.
    No external library or joystick is required.
 4. Open Serial Monitor at **115200 baud**, select **Newline** or **Both NL & CR**.
    Expect the command menu, READY and a blank display. Opening the monitor
@@ -29,6 +29,8 @@ a space: pace 250, not pace250. Incomplete lines wait for a line ending.
 
 | Command | What you should see |
 |---|---|
+| snake | One scripted Snake round, then hold score7 |
+| snake-loop | Repeat that round, with a blank between rounds |
 | digits | An8 sweeps the seven numeric positions, left to right, then repeats |
 | groups | Same seven digits, then the right-hand symbol group, wheel group and left-hand symbol group; repeats |
 | all | All ten connected display groups held on |
@@ -61,6 +63,44 @@ from the old unwanted symbol bits: normal numeral/effect frames still exclude
 columns6,8,9. No command writes undefined columns10..15.
 groups is a logical group tour, not a strictly left-to-right spatial sweep
 of all symbols: some groups contain symbols in separated physical locations.
+
+## Scripted Snake playback
+
+Keep **PanelShowcase.ino, SnakeReplay.h and SnakeGame.h together** in the same
+PanelShowcase sketch folder. The replay uses the same game engine as PanelSnake;
+an automated check keeps those engine copies in sync. Neither joystick nor
+START button input is needed, and D11 stays silent.
+
+For a take at the playable game's movement speed, send these as separate lines:
+
+```text
+pace 450
+snake
+```
+
+The display previews the initial three-bar snake and blinking food for one second,
+then runs a rehearsed round. It crosses the display, eats seven pieces of food,
+grows from3 to10 bars, and ends with a wall collision. The body freezes/blinks,
+then GAME, OVER and score7 appear. The final score stays visible until another
+command. All turns go through the normal game rules; food locations are scripted
+and remain outside the body. The replay is independent of the random-effects seed.
+
+Send **snake-loop** instead for repeated takes. The whole round repeats with a
+one-second blank between rounds. Send **hold** to freeze the current picture,
+or **stop** to blank and cancel playback. Starting snake again always resets
+the same round. A new command restarts rather than resumes a held replay.
+
+pace controls the movement interval, in milliseconds per step; it does not
+stretch food/death blinking or GAME/OVER timings. It can be changed during
+playback. The existing default pace is500ms; pace450 matches PanelSnake.
+One round takes roughly24.5s at450ms, or26.4s at500ms, including the preview,
+collision and ending; a loop adds its one-second blank. These are nominal
+software durations, not measured camera timing.
+
+The ordinary demo/loop command remains the general display-effects tour.
+Use snake/snake-loop to record the game replay separately. Identify such takes
+as scripted replay in the clip note/media index; manual joystick gameplay is
+recorded with PanelSnake.
 
 ## Useful individual takes
 
@@ -132,7 +172,7 @@ shot can show the Arduino and wiring. The creator chooses final shots/pacing.
 Store original takes in the production media folder camera/panel_tests/footage/.
 Record the effect, pace, seed (if used) and take number in a note or at the start
 of the clip. Preserve originals; MEDIA_INDEX.md will identify useful sections.
-Decorative effects should remain distinguishable from real Snake footage.
+Distinguish decorative effects, scripted Snake replay and manually controlled gameplay in the media index.
 
 ## Validation and returning to the game
 
