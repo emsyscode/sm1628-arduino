@@ -1,3 +1,20 @@
+## SCORE label and playable speed command — 2026-10-26
+
+PanelSnake and SnakeReplay render SCORE plus the actual score together, leaving
+symbol groups off. Middle-colon individual row bit remains NEEDS_ENGINEER_REVIEW;
+raw column6 group is known, no row invented. ManualMap bit-test instructions added.
+PanelSnake pace50..2000ms accepts newline-terminated commands, with bounded input
+and rejection of malformed/overlong/out-of-range values. Immediate single-letter
+controls retained. Change resets the movement timer, not the round.
+
+Uno compile: PanelSnake8942 flash/381 static SRAM; PanelShowcase9988/685.
+Compiled AVR GPIO/UART tests pass for SCORE/value payloads in actual game and
+replay, unchanged rules/inputs/button/buzzer, live slow/fast pace and invalid
+commands; showcase general-effects regression also run. No hardware upload.
+Only Arduino core new.cpp unused-parameter warnings. Local compiler launch
+requires approved unsandboxed execution due Windows DLL relocation error.
+Electrical/optical operation of this revision awaits creator test.
+
 CURRENT ROUTING (2026-10-26): the exact former PanelDemo described in this historical baseline record is now firmware/LegacyPanelDemo. The new PanelDemo is a numeric-only physical-order test. See docs/symbol-bit-correction.md for the deliberate correction and new checks. The original refactor was subsequently reported working by the creator; the latest corrected numeric renderer still needs a hardware run.
 
 # Validation of the new baseline
@@ -61,4 +78,3 @@ source slot. Stop further driver cleanup until that comparison succeeds.
 No game logic, key reader, joystick or new pin assignment is introduced in this
 retest. The original's whole-port direction setup must be resolved before adding
 those inputs.
-

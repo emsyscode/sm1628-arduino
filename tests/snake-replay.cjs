@@ -82,7 +82,7 @@ const gameOver = glyphFrame([[1, 0x3D], [2, 0x77], [3, 0x54], [4, 0x79]]);
 const over = glyphFrame([[1, 0x3F], [2, 0x1C], [3, 0x79], [4, 0x50]]);
 assert(frames.some(f => same(f.data, gameOver)), 'GAME frame');
 assert(frames.some(f => same(f.data, over)), 'OVER frame');
-assert.deepEqual(m.frames.at(-1).data, glyphFrame([[6, 7]]), 'final score7');
+assert.deepEqual(m.frames.at(-1).data, glyphFrame([[0, 0x6D], [1, 0x39], [2, 0x3F], [3, 0x50], [4, 0x79], [6, 7]]), 'final score7');
 const finishedFrames = m.frames.length;
 m.run(500);
 assert.equal(m.frames.length, finishedFrames, 'one round holds final score');
@@ -121,4 +121,3 @@ for (const f of m.frames) {
 }
 assert.equal(m.buzzerEdges.filter(e => e.on).length, 0, 'filming remains silent');
 console.log('PASS: shared rules, all38 body states, seven foods/growth, collision, GAME/OVER/score, repeatable round, looping, hold/stop, independent pace/blinking and numeric-only silent output.');
-

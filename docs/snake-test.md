@@ -54,7 +54,7 @@ reset the board.
    is **450ms per step**, independent of joystick displacement.
 6. Eating food grows the snake and increments score. A wall/missing path or
    self-collision freezes and blinks the body for about1.6 seconds. The display
-   then alternates approximate GAME, OVER and numeric score. Serial prints the
+   then alternates approximate GAME, OVER and a single SCORE/value screen. Serial prints the
    unambiguous GAME OVER and score. Seven-segment M/V/R are approximations.
 7. After game over, release and press START for another round. Serial s also works. Joystick movement no longer starts/restarts the game. Holding the button does not restart it repeatedly.
 
@@ -70,10 +70,30 @@ Use a normally open momentary button between D4 and GND. INPUT_PULLUP holds the 
 
 The code requires 30ms of stable input and one new press. Holding at startup requires release before pressing to start. A press during play does not reset the round; after GAME OVER, a fresh press starts again. The button can also leave the bar test and start play. Calibration must finish first. Serial s remains available.
 
+## Game speed and score display
+
+Send `pace 300` followed by Enter for one move every300ms.
+Valid range:50..2000ms; lower is faster. `pace 450` restores the default.
+Use Newline or Both line endings. Unlike the single-letter controls, pace needs
+a complete line; after typing p, finish that line before another command.
+Invalid/out-of-range/overlong lines leave the speed unchanged and print usage.
+A valid change takes effect during play, starting a fresh full movement interval.
+It persists across rounds and recalibration until board reset. Joystick polling,
+display refresh, food/death blinking and buzzer pulse lengths stay independent.
+
+The ending retains GAME and OVER, then shows SCORE and the actual value together
+on the seven numeric positions. SCORE uses five seven-segment approximations;
+the last two positions hold0..46 (single-digit values are right-aligned).
+The theoretical maximum is46 foods from the initial three-bar snake.
+No separate label/value screens. The exact central-colon bit is not established:
+raw column6 contains the return/colon group, but enabling it wholesale would also
+light unwanted symbols. See manual-mapping.md for the isolated-bit test.
+
 ## Quick controls
 
 | Input | Meaning |
 |---|---|
+| pace 300 + Enter | Set300ms per movement;50..2000, lower=faster |
 | s | Start/restart after calibration, or leave the bar test and play |
 | c | Blank and recalibrate; centre the stick for one second |
 | j | Toggle raw X/Y, centre offsets and interpreted direction reports |
@@ -133,4 +153,3 @@ Check direction labels and bar assignments before judging gameplay/readability.
 If the display stays blank, report startup output; if controls are wrong, report
 j values at centre and each direction. Keep working PanelDemo/ManualMap for
 comparison. No driver-wide compatibility or final production firmware is claimed.
-

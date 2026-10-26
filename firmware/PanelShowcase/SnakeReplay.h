@@ -176,6 +176,10 @@ struct SnakeReplay {
         drawGlyph(frame, columns, 3, 0x79);
         drawGlyph(frame, columns, 4, 0x50);
       } else {
+        const uint8_t label[5] = {0x6D, 0x39, 0x3F, 0x50, 0x79};
+        for (uint8_t i = 0; i < 5; ++i) {
+          drawGlyph(frame, columns, i, label[i]);
+        }
         const uint8_t numerals[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
         uint8_t score = game.score;
         uint8_t digit = 6;
@@ -188,4 +192,3 @@ struct SnakeReplay {
     }
   }
 };
-
