@@ -1,5 +1,38 @@
 # Sources and development status
 
+## SM1628 / SM1628B and transposed panel wiring — creator report, 2026-10-26
+
+Latest explanation supplied by the creator, retained as project technical input.
+This records the report; no new manufacturer-document verification, pinout,
+oscillator implementation or hardware measurement was performed in this update.
+
+Verbatim:
+> The SM1628 / SM1628B are basically the same, but the B has an internal protection anti static and it has an external oscillator. Otherwise they are the same.
+>
+> The important part is that most manufacturers of the panels they are on, to deal with the fact that they were limited to 7 digits, they swapped the grids with the segments. In practice, this means inverting the whole code and pins to control that.
+
+Working interpretation:
+- Treat SM1628 and SM1628B as the same basic control family on the creator's
+  explanation, with the stated B-version differences above. Preserve "external
+  oscillator" as reported; do not invent oscillator components or connections.
+- Panel manufacturers swap the roles of grid and segment outputs to work around
+  the seven-grid/digit limitation. The creator describes this as common practice;
+  its prevalence is reported, not independently quantified here.
+- "Inverting the code and pins" refers here to transposing the display's
+  grid/segment relationship and adapting the output/bit map and pin-role labels.
+  It does not by itself specify complemented bits, reversed serial bit order,
+  swapped Arduino DATA/CLK/STB wires or a changed command protocol.
+- Keep the IC variant distinction separate from how a particular panel is wired.
+  The map must record which driver output reaches each physical digit/bar/icon.
+  Existing map-based design can express that relationship; no universal map is
+  supplied by this explanation alone.
+- This clarification concerns SM1628 and SM1628B. It does not establish TM1628
+  or SM1628C equivalence, connector interchangeability or an oscillator pinout.
+- Exact panel wiring/output map remains the next implementation input. No code
+  or wiring was changed solely on the phrase "invert the whole code."
+
+
+
 The project builds on Jose Luis Monteiro's experiments, not on an assumption that
 the old examples are interchangeable libraries.
 
