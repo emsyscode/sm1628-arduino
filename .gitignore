@@ -1,4 +1,4 @@
 build/
-.arduino/
+node_modules/
 __pycache__/
 *.pyc

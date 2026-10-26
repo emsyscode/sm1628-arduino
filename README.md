@@ -1,50 +1,41 @@
-# SM1628 Arduino
+# SM1628 panel — working-source baseline
 
-Clean SM1628B display code based on Jose Luis Monteiro's salvaged-panel examples.
+This repository has been reset around the **new sketch reported working by the
+creator on the actual salvaged panel**. Earlier generated driver examples failed
+on that hardware and are retired from the active project.
 
-**Experimental: software tested, hardware validation pending.** Mode 0x03 and
-fourteen-byte writes follow the original SM1628B examples. The new seven-digit
-board's exact IC, wiring and map remain unconfirmed. Similar names such as TM1628
-or SM1628C do not establish compatibility.
+## Start here
 
-## Choose a starting point
+Open [firmware/PanelDemo/PanelDemo.ino](firmware/PanelDemo/PanelDemo.ino) in Arduino
+IDE, select **Arduino Uno**, and compile/upload using the existing tested wiring.
+It runs the original repeating numeral test immediately: there is no enable flag.
 
-| Version | Open | Purpose |
-| --- | --- | --- |
-| Small standalone sketch | [Minimal.ino](examples/Minimal/Minimal.ino) | Understand initialization and frame writes in one short file; no library dependency |
-| Fuller library | [MappedPanel.h](src/MappedPanel.h) | Mapped digits/numbers, individual segments/icons, buffered updates and input validation |
-| Raw driver | [Sm1628B.h](src/Sm1628B.h) | Full frames, bounded RAM writes, brightness and display control |
+- Arduino D7: DATA; D8: CLK; D9: STB.
+- These are Arduino GPIO assignments, not panel connector pin numbers.
+- The retained setup also configures all D0..D13 as outputs. It is Uno-specific.
+  Do not attach a joystick or other peripherals to those pins yet.
+- Keep the power/wiring arrangement already used for the working original.
 
-The fuller version adds functionality alongside the small version; the teaching
-sketch stays small. [What changed from the originals](docs/code-review.md).
+The clean sketch preserves the active sender timings, startup, full brightness,
+fourteen-byte patterns, source slot order, per-frame blanking and clear sequence.
+It removes the unused clock application, key reader and repeated numeral switch
+branches. The original Timer1/register setup is retained and explained.
 
-## Follow the tutorials
+**The original was reported working by the creator. The refactor still needs
+their hardware retest.** Compile/AVR comparisons do not substitute for that test.
 
-1. [Identify the board and bring it up](docs/01-bring-up.md).
-2. [Walk outputs and record the panel map](docs/02-mapping.md).
-3. [Understand the small sketch](docs/minimal.md).
-4. [Use the buffered API](docs/api.md) and [BufferedCounter](examples/BufferedCounter/BufferedCounter.ino).
-5. [Read the inherited protocol](docs/protocol.md) and [validation evidence](docs/validation.md).
+## Reference and explanation
 
-For library examples, install this folder as an Arduino library or pass
-arduino-cli --library with its absolute path. Minimal.ino is standalone.
-Examples keep hardware output disabled until the bench setup is confirmed.
-Minimal and BufferedCounter use SM1628_BENCH_READY=1; earlier RawFrame and
-SegmentWalk examples use their local kBenchReady flag.
+- [Untouched supplied sketch](reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0/SM1628B_Panel_DVD_Reader_7digits_sanake_v0.ino).
+- [What is retained and why](docs/baseline.md).
+- [How the test works](docs/walkthrough.md).
+- [Validation and next bench comparison](docs/validation.md).
+- [Why earlier code was retired](archive/README.md).
 
-The included six-digit map is CODE_DERIVED from the 2020 source; it is not a map
-of the new seven-digit board. A blank [profile template](profiles/template.json)
-is provided for that board's measured map.
+This baseline is a display test, **not Snake firmware**, despite the supplied
+filename. The reported numeric order is 3,1,2,4,5,6,7 from the left; it is not yet a verified slot-to-digit map. See [panel observations](docs/panel-observations.md).
+The Snake computer prototype, joystick animations and script remain in the
+existing project/production repositories.
 
-No timer reservation, heap allocation or whole-port GPIO writes are used.
-Rendering is separate from sending, so the application can read its joystick
-between updates. No measured joystick/display latency is claimed.
-
-Hardware Snake integration follows the panel map. Video scripts and animations
-remain in the production project. Key-read support awaits exact-part review;
-the original key code has a memory indexing bug and inconsistent read lengths.
-
-Based on [Jose Luis Monteiro / emsyscode](https://github.com/emsyscode).
-[Source history and remaining work](docs/sources.md).
-No distribution license has been selected yet; agree it with the authors before
-public release.
+Based on Jose Luis Monteiro's work. No public release or new distribution license
+is claimed by this private development repository.

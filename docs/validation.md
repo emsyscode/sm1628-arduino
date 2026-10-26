@@ -1,53 +1,61 @@
-# Validation
+# Validation of the new baseline
 
-## Version 0.2.0 — 2026-10-25
+## Evidence levels
 
-Uno / Arduino AVR core 1.8.6; example output enabled for the active builds below.
+- Original: creator reports it works on their physical panel.
+- Refactor: compiles and matches the original's captured transaction sequence.
+- Refactor on hardware: **not yet retested by the creator**.
 
-| Build | Flash | Static SRAM |
+Neither compilation nor the AVR comparison certifies panel electrical behavior.
+
+## Local results — Arduino Uno, AVR core 1.8.6
+
+| Sketch | Flash | Static SRAM |
 | --- | ---: | ---: |
-| Standalone Minimal | 1,076 bytes | 28 bytes |
-| BufferedCounter | 2,298 bytes | 248 bytes |
-| ProtocolTest | 2,034 bytes | 29 bytes |
-| PanelTest | 3,288 bytes | 267 bytes |
+| Untouched supplied reference | 3,084 bytes | 468 bytes |
+| Clean PanelDemo | 2,522 bytes | 327 bytes |
 
-Local compiled-AVR simulation passed:
-- 19 raw protocol transactions.
-- 149 mapped-panel transactions, including all ten original numeral masks
-  at each of the six source-derived digit positions.
-- Standalone initialization and both 500 ms blink transitions.
+Original source hash checked:
+4E9521DC761201B3C6FEB347DB51230398487458F13151BA866038D02293B9B4
 
-The panel fixture also checks seven-digit capacity, overflow, padding,
-preservation of an unrelated icon, invalid/aliased maps, copied map lifetime,
-suppression of unchanged frames, forced resend, restoration after external
-writes and bounded RAM writes. Reference masks/grid shifts are recorded with
-the original source blob identity in tests/legacy-reference.json.
+Both real .hex files were executed with avr8js 0.21.1. One complete cycle
+matched at all 380 STB transactions: startup, initial clear, eighty numeral/slot
+combinations and final clear. Every literal byte, bit order, boundary, source
+blanking command, full-brightness command, 100 ms hold and port direction state
+was checked. Expected patterns are parsed from the untouched reference, not from
+the new sketch.
 
-Only inherited Arduino core new.cpp unused-parameter warnings were emitted.
-The local compiler required execution outside the Windows sandbox because of
-its DLL relocation error. No firmware was uploaded.
-Pin-range rejection was added after these size measurements; CI recompiles and
-tests that final revision. Sizes above identify the local pre-pin-guard build.
+Simulated durations: original 8223.250 ms; refactor 8223.024 ms.
+Maximum difference between corresponding packet first-clock-to-STB-end durations:
+8.813 us. Refactoring changes CPU instruction timing slightly even while the
+explicit delays are retained. This comparison does not claim cycle-exact
+electrical waveform identity.
+
+The original emits F_CPU redefinition and unused-variable warnings; it is left
+untouched. The clean sketch emitted only inherited Arduino core new.cpp warnings.
+No Arduino upload was performed. The Windows sandbox could not launch avr-g++;
+compilation succeeded outside the sandbox with user approval.
 
 ## Reproduce
 
-Install arduino-cli, Arduino AVR core 1.8.6 and Node.js.
-The exact compile commands, including both guarded/active examples, are in
-.github/workflows/validate.yml. Build the two fixtures to build/protocol and
-build/panel, and the enabled Minimal example to build/minimal, then run:
+Install Arduino CLI, Arduino AVR core 1.8.6 and Node.js.
 
+    arduino-cli compile --fqbn arduino:avr:uno --build-path build/reference reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0
+    arduino-cli compile --fqbn arduino:avr:uno --build-path build/refactor firmware/PanelDemo
     npm install --ignore-scripts --no-audit --no-fund
-    npm run test:avr
+    npm test
 
-Local runs reused avr8js 0.21.1 from the existing project via the decoder's
-optional third argument (module path). CI installs the pinned dev dependency.
+The local comparison reused an existing avr8js installation via the optional
+fourth CLI argument (module directory). CI installs the pinned dependency.
+The active workflow builds both sketches and performs this comparison.
 
-These tests decode the real compiled AVR GPIO stream. They are not an SM1628 IC,
-electrical or optical simulation. The legacy profile is code-derived; the new
-seven-digit panel map and hardware refresh/readability remain unverified.
+## Smallest useful hardware check
 
-## Earlier 0.1.0 baseline
+Use the same Uno, wiring and power arrangement on which the original worked.
+Upload the original, observe a full cycle, then upload PanelDemo and compare
+the same visible behavior. Record which physical digit/icon corresponds to each
+source slot. Stop further driver cleanup until that comparison succeeds.
 
-ProtocolTest: 2,034 bytes flash / 29 bytes static SRAM. RawFrame and SegmentWalk
-with their bench guard disabled: 1,540/1,538 bytes flash, respectively, and
-188 bytes static SRAM each. Original protocol regression: 19 transactions.
+No game logic, key reader, joystick or new pin assignment is introduced in this
+retest. The original's whole-port direction setup must be resolved before adding
+those inputs.

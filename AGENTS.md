@@ -1,12 +1,20 @@
-# Development rules
+# Working-panel development rules
 
-Keep transport, measured panel mapping, examples and game logic separate.
-Preserve attribution to Jose Luis Monteiro's original examples.
-Do not claim hardware compatibility from a successful compile or simulated GPIO.
-Record unknown electrical facts and addresses instead of inventing them.
-Confirm the exact part/suffix and board wiring before changing hardware guidance.
-Keep tutorials short, sequential and reproducible; comment intent and constraints.
-Test frame transactions and mapping with the real C++ implementation.
-Keep video scripts, narration and raw footage in the production repository.
-Use the browser/YouTube Studio for video search and captions; reserve paid vidIQ
-calls for distinct advantages and obtain credit approval before spending.
+The source of truth is the user-supplied working sketch under reference/WorkingPanel.
+SHA-256: 4E9521DC761201B3C6FEB347DB51230398487458F13151BA866038D02293B9B4.
+Do not edit that file. Keep its byte-level identity checked in CI.
+
+Active code is firmware/PanelDemo, not the archived generic library.
+Keep sender timing, command order, pattern bytes, brightness, scan-slot order,
+per-frame blanking and register setup until a particular change has passed a
+separate hardware comparison. Label any untested replacement plainly.
+Do not infer a panel connector map or physical digit order from generic fonts.
+
+The reference's whole-port setup owns Uno D0..D13; never silently combine it
+with joystick/button connections. Remove that setup only as an explicit,
+separately tested change.
+No disabled-by-default example guards in the primary baseline demonstration.
+Distinguish "creator reports original works", "refactor trace matches", and
+"creator has tested refactor on hardware".
+Do not add game, key reading, clock demo or generalized family support until
+the display baseline is accepted. Preserve attribution and original sources.
