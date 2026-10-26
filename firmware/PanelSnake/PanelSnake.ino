@@ -17,6 +17,8 @@
 
     Serial controls: j = input readings, c = recalibrate, m = bar check,
     n = next bar, s = start/restart, w/a/d/z = up/left/right/down, ? = help.
+    Send pace 300 then Enter for 300 ms per move; 50..2000 ms, lower is faster.
+    Speed persists across rounds until reset; it does not change input sampling.
     The bar check starts at the first digit's top bar, then steps a..g across
     each digit from left to right. START also leaves the bar check to play.
 
@@ -52,7 +54,13 @@ constexpr uint8_t kBuzzerOnLevel = HIGH;
 constexpr uint8_t kBuzzerOffLevel = LOW;
 
 // Independent clocks for gameplay, input sampling and display updates.
-constexpr unsigned long kMoveMs = 450;
+uint16_t moveIntervalMs = 450;
+
+// Multi-character pace command; single-key controls still work without Enter.
+char paceCommand[24] = {};
+uint8_t paceLength = 0;
+bool readingPace = false;
+bool paceOverflow = false;
 constexpr unsigned long kInputMs = 5;
 constexpr unsigned long kDrawMs = 40;
 
@@ -210,6 +218,10 @@ void glyph(uint8_t digit, uint8_t mask) {
 }
 
 void scoreFrame() {
+  // SCORE and its value share the same seven-position screen.
+  const uint8_t label[5] = {0x6D, 0x39, 0x3F, 0x50, 0x79};
+  for (uint8_t i = 0; i < 5; ++i)
+    glyph(i, label[i]);
   // Standard a..g masks in the inherited row order; numeric font can now use
   // only our seven numeric columns, leaving every symbol column clear.
   const uint8_t numbers[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
@@ -393,9 +405,43 @@ void printBar() {
   Serial.println(kDigitColumns[testCell / 7]);
 }
 
+void finishPaceCommand() {
+  char* end = nullptr;
+  const long value = strtol(paceCommand + 5, &end, 10);
+  if (!paceOverflow && paceLength <= 9 && strncmp(paceCommand, "pace ", 5) == 0 &&
+      end != paceCommand + 5 && *end == '\0' && value >= 50 && value <= 2000) {
+    moveIntervalMs = uint16_t(value);
+    lastMove = millis();  // Start a full interval at the new speed.
+    Serial.print(F("PACE "));
+    Serial.print(moveIntervalMs);
+    Serial.println(F(" ms per move. Lower = faster."));
+  } else {
+    Serial.println(F("Use pace 50..2000, then Enter. Example: pace 450"));
+  }
+  readingPace = false;
+  paceLength = 0;
+  paceOverflow = false;
+  memset(paceCommand, 0, sizeof(paceCommand));
+}
+
 void commands() {
   while (Serial.available()) {
     const char c = char(Serial.read());
+    if (readingPace) {
+      if (c == '\r' || c == '\n') {
+        finishPaceCommand();
+      } else if (paceLength < sizeof(paceCommand) - 1) {
+        paceCommand[paceLength++] = c;
+      } else {
+        paceOverflow = true;
+      }
+      continue;
+    }
+    if (c == 'p') {
+      readingPace = true;
+      paceCommand[paceLength++] = c;
+      continue;
+    }
     if (c == '\r' || c == '\n' || c == ' ')
       continue;
     switch (c) {
@@ -440,7 +486,8 @@ void commands() {
         break;
       case '?':
         Serial.println(
-            F("s=start/restart c=calibrate j=inputs m=bar test n=next bar w/a/d/z=steer"));
+            F("s=start/restart c=calibrate j=inputs m=bar test n=next bar w/a/d/z=steer; pace "
+              "50..2000 + Enter"));
         break;
       default:
         Serial.println(F("Unknown key; send ? for help."));
@@ -480,7 +527,8 @@ void setup() {
   clearPanel();
   sei();
   Serial.println(F("PanelSnake. A0=X A1=Y START=D4-GND BUZZER=D11 (active)."));
-  Serial.println(F("s=start c=calibrate j=inputs m=bar test n=next bar ?=help"));
+  Serial.println(
+      F("s=start c=calibrate j=inputs m=bar test n=next bar pace 450 + Enter=speed ?=help"));
   beginCalibration();
 }
 
@@ -494,7 +542,7 @@ void loop() {
     readStartButton(now);
     readStick(now);
   }
-  if (phase == PLAYING && now - lastMove >= kMoveMs) {
+  if (phase == PLAYING && now - lastMove >= moveIntervalMs) {
     lastMove = now;  // No catch-up burst if serial or a frame took longer.
     const SnakeGame::Result result = game.step(uint16_t(random(65536L)));
     if (result == SnakeGame::ATE) {
@@ -526,4 +574,3 @@ ISR(TIMER1_COMPA_vect) {
   ++legacySeconds;
   legacyFlag = !legacyFlag;
 }
-

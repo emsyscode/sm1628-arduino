@@ -186,3 +186,13 @@ To play Snake again, upload firmware/PanelSnake with SnakeGame.h beside it.
 Keep the joystick centred through calibration, then press START (D4 to GND).
 The previously accepted joystick/game version remains in repository history.
 
+
+
+## Single-screen score label — 2026-10-26
+
+Both PanelSnake and the showcase replay now put SCORE and its value on one
+screen after GAME/OVER. Replay ends at SCORE7. Letters are seven-segment
+approximations; colon remains off until its individual RAM bit is identified.
+No extra end-screen time was added. Existing pace controls the replay; the
+playable PanelSnake now accepts the same pace50..2000ms command with Enter.
+Camera clips recorded before this revision have the old number-only ending.

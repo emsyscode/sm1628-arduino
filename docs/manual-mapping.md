@@ -28,8 +28,7 @@ column 0 7
 ```
 
 Here, 0 is the raw column and 7 is the numeral to draw. Expect a 7 on the leftmost
-numeric digit. This selection must happen before 
-` can advance it.
+numeric digit. This selection must happen before `n` can advance it.
 
 **Then send:**
 
@@ -37,8 +36,7 @@ numeric digit. This selection must happen before
 n
 ```
 
-Repeat 
-` once per step. `p` goes back. There is no time limit.
+Repeat `n` once per step. `p` goes back. There is no time limit.
 Do not type all the steps as one line. Each command needs its own line ending.
 
 | Raw column | Expected with numeral 7 on our panel |
@@ -69,10 +67,8 @@ Send:
 ordered
 ```
 
-Expect a 7 on the leftmost digit. Then 
-` moves to the second, third, fourth,
-fifth, sixth and seventh digit. The next 
-` wraps to the first. `p` moves back,
+Expect a 7 on the leftmost digit. Then `n` moves to the second, third, fourth,
+fifth, sixth and seventh digit. The next `n` wraps to the first. `p` moves back,
 also wrapping. Symbols are skipped. Every result stays lit until changed.
 
 The raw column map is **0, 1, 7, 2, 3, 4, 5** from left to right.
@@ -126,3 +122,27 @@ transport and initialization with the explicit D0 serial-input change.
 The latest ordered mode passes compiled Uno UART/GPIO tests; its new physical
 stepping still needs a bench run. Tests do not emulate the panel electrically.
 
+
+## Isolate the central colon
+
+Raw column6 is confirmed as the return/both-colons group, not a single colon.
+Using this standalone diagnostic's setup above (9600baud, Newline/Both), send
+each command separately and note which single symbol lights:
+
+```text
+bit 0 6
+bit 2 6
+bit 4 6
+bit 6 6
+bit 8 6
+bit 10 6
+bit 12 6
+clear
+```
+
+Each bit command replaces the entire frame with one bit, held until the next
+command. Here the first number is a RAM byte address,6 is the bit position.
+Record the address lighting the colon physically between the score label and
+value. These commands inspect all seven row bits; their symbol identities are
+not yet assigned. Do not use n here to skip directly to the next row: n walks
+every storage bit, not just column6.
