@@ -16,13 +16,16 @@
  pace250 is NOT valid: send pace 250 on its own line.
  Send ? for all commands and status for the current state.
 
- This is display demonstration footage, not gameplay or a measurement.
+ snake plays one scripted round; snake-loop repeats it without joystick input.
+ Use pace 450 before snake to match the game's movement interval.
+ This is repeatable demonstration footage, including a scripted game replay.
  Symbols are intentionally included only in groups/all/blink.
  Other panels may require a different column/segment map.
 */
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <string.h>
+#include "SnakeReplay.h"
 constexpr uint8_t kStartPin = 4;
 constexpr uint8_t kBuzzerPin = 11;
 
@@ -47,7 +50,8 @@ enum Effect : uint8_t {
   FILL,
   SPARKLE,
   RANDOM_DIGITS,
-  BARS
+  BARS,
+  SNAKE_REPLAY
 };
 
 uint8_t effect = OFF, cueIndex = 0;
@@ -59,9 +63,11 @@ char line[32];
 uint8_t lineLength = 0;
 bool discardLine = false;
 
+constexpr uint16_t kReplayDrawMs = 40;
+SnakeReplay replay;
+
 // Each cue is shown immediately, then held for ticks * pace milliseconds.
-// Includes a1.5s blank pre-roll and a final blank. About46.7s nominal total; camera timing still
-// needs a filming test.
+// Includes a 1.5 s blank pre-roll and a final blank; about 46.7 s total.
 struct Cue {
   uint8_t effect;
   uint16_t pace, ticks;
@@ -181,6 +187,8 @@ const __FlashStringHelper* effectName(uint8_t e) {
       return F("random");
     case BARS:
       return F("bars");
+    case SNAKE_REPLAY:
+      return F("snake-replay");
     default:
       return F("off");
   }
@@ -238,6 +246,9 @@ void render() {
       for (uint8_t digit = 0; digit < 7; ++digit)
         columnGlyph(kDigitColumns[digit], uint8_t(1u << (step % 7)));
       break;
+    case SNAKE_REPLAY:
+      replay.render(frame, kDigitColumns, millis());
+      break;
     default:
       break;
   }
@@ -269,6 +280,42 @@ void activate(uint8_t e, uint16_t pace, uint32_t value) {
   running = e != OFF && e != ALL_ON;
   render();
   status();
+}
+
+void startReplay(bool repeat) {
+  sequence = false;
+  repeating = false;
+  effect = SNAKE_REPLAY;
+  intervalMs = kReplayDrawMs;
+  step = 0;
+  lastStepAt = millis();
+
+  replay.begin(lastStepAt, repeat, individualPace);
+  running = true;
+  render();
+  status();
+
+  Serial.println(repeat ? F("SNAKE REPLAY LOOP: scripted turns/food; stop or hold to finish.")
+                        : F("SNAKE REPLAY: scripted round; final score holds."));
+}
+
+void updateReplay(unsigned long now) {
+  const SnakeReplay::Event event = replay.update(now);
+
+  if (event == SnakeReplay::FOOD) {
+    Serial.print(F("REPLAY FOOD score="));
+    Serial.println(replay.game.score);
+  } else if (event == SnakeReplay::COLLISION) {
+    Serial.print(F("REPLAY COLLISION score="));
+    Serial.println(replay.game.score);
+  } else if (event == SnakeReplay::DONE) {
+    running = false;
+    render();
+    Serial.print(F("SNAKE REPLAY DONE score="));
+    Serial.println(replay.game.score);
+  } else if (event == SnakeReplay::RESTARTED) {
+    Serial.println(F("SNAKE REPLAY RESTART."));
+  }
 }
 
 void beginCue() {
@@ -316,6 +363,8 @@ bool number(const char* text, uint32_t maximum, uint32_t& value) {
 
 void help() {
   Serial.println(F("PanelShowcase: 115200 baud, Newline/Both. START: digits"));
+  Serial.println(F("snake=scripted round; snake-loop=repeats; final score7."));
+  Serial.println(F("Use pace 450 then snake for game-speed playback; default pace500."));
   Serial.println(
       F("digits=7 numeric positions left-to-right; groups=7 digits then3 symbol groups"));
   Serial.println(F("all=all connected groups ON; off/stop=blank; blink=all groups flash"));
@@ -326,8 +375,7 @@ void help() {
   Serial.println(F("pace 250 sets individual step interval50..2000ms (default500)."));
   Serial.println(F("demo=full sequence ONCE; loop=repeats; hold=freeze; stop=blank immediately"));
   Serial.println(F("Demo timings are fixed; pace is rejected during demo. status=state; ?=help."));
-  Serial.println(
-      F("Camera start/stop stays manual. Effects are demonstration footage, not gameplay."));
+  Serial.println(F("Camera start/stop stays manual. Snake mode is scripted playback."));
 }
 
 void executeLine() {
@@ -353,7 +401,13 @@ void executeLine() {
       return;
     }
     if (!strcmp(cmd, "pace")) {
-      individualPace = intervalMs = uint16_t(value);
+      individualPace = uint16_t(value);
+      if (effect == SNAKE_REPLAY) {
+        replay.moveIntervalMs = individualPace;
+        intervalMs = kReplayDrawMs;
+      } else {
+        intervalMs = individualPace;
+      }
       lastStepAt = millis();
     } else if (!strcmp(cmd, "value")) {
       counterStart = value;
@@ -385,6 +439,10 @@ void executeLine() {
   }
   if (!strcmp(cmd, "hold")) {
     stop(false);
+    return;
+  }
+  if (!strcmp(cmd, "snake") || !strcmp(cmd, "snake-loop")) {
+    startReplay(!strcmp(cmd, "snake-loop"));
     return;
   }
   if (!strcmp(cmd, "demo") || !strcmp(cmd, "loop")) {
@@ -474,6 +532,11 @@ void setup() {
 void loop() {
   commands();
   const unsigned long now = millis();
+
+  if (running && effect == SNAKE_REPLAY) {
+    updateReplay(now);
+  }
+
   if (running && now - lastStepAt >= intervalMs) {
     lastStepAt = now;
     ++step;  // No late catch-up burst.

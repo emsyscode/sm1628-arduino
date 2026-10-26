@@ -39,3 +39,5 @@ jobs:
         run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/showcase firmware/PanelShowcase
       - run: node tests/panel-showcase.cjs build/showcase/PanelShowcase.ino.hex
 
+      - run: node tests/snake-replay.cjs build/showcase/PanelShowcase.ino.hex
+

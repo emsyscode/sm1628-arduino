@@ -18,7 +18,7 @@ is also included (115200 baud, readings every 500 ms).
 
 ## Filming routines
 
-Open [PanelShowcase](firmware/PanelShowcase/PanelShowcase.ino). Serial115200, Newline/Both. Starts blank. Send digits for a sweep, count for synchronized digits, or value 9995 then carry for decimal carry. Send demo for the full46.7s sequence, loop to repeat, hold to freeze, stop to blank. [Commands and recording guide](docs/filming-showcase.md). Upload PanelSnake again to return to the game. New showcase hardware/filming test is pending.
+Open [PanelShowcase](firmware/PanelShowcase/PanelShowcase.ino). Serial115200, Newline/Both. Starts blank. Send digits for a sweep, count for synchronized digits, or value 9995 then carry for decimal carry. Send demo for the full46.7s effects sequence, loop to repeat, hold to freeze, stop to blank. For scripted Snake playback, send pace 450 then snake (one round) or snake-loop (repeats); no joystick needed. Keep both headers with the showcase sketch. [Commands and recording guide](docs/filming-showcase.md). Upload PanelSnake again to return to the game. New showcase hardware/filming test is pending.
 
 ## Map the panel manually
 
