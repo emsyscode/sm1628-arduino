@@ -4,7 +4,7 @@ On this transposed panel, one byte pair is a segment row across several groups.
 An entire two-byte value is not a single character. Bit 0 of the first byte
 selects raw column 0, while bit 1 of the second byte selects raw column 9.
 
-The original mixed pattern for numeral7 begins with `{0x01,0x02}` for its top
+The original mixed pattern for numeral 7 begins with `{0x01,0x02}` for its top
 row. Sending both bytes at column 0 requests the numeric top bar **and** a light
 in the DVD/playback symbol group. It does not require electrical ghosting to
 explain those extra symbols.

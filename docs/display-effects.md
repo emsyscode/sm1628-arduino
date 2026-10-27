@@ -21,10 +21,10 @@ pull-up. D11 stays LOW/silent. START and joystick are not read.
 | `value 9995`, then `carry` | Count 9995, 9996,...10000 with decimal carry |
 | `bars` | Matching a-g bars across numeric digits |
 | `chase` | Decorative five-bar trail |
-| `fill` | Fill49 numeric bars, hold, then erase |
+| `fill` | Fill 49 numeric bars, hold, then erase |
 | `sparkle` / `random` | Seeded random bars / numerals |
-| `pace 250` | Step interval50-2000 ms, default 500 |
-| `seed 7` | Repeatable effects seed1-2147483647 |
+| `pace 250` | Step interval 50-2000 ms, default 500 |
+| `seed 7` | Repeatable effects seed 1-2147483647 |
 | `demo` / `loop` | Full effects sequence once / repeatedly |
 | `snake` / `snake-loop` | One fixed game round / repeated round |
 | `hold` | Freeze picture and cancel timing |
@@ -38,8 +38,8 @@ Numeric effects keep them clear. Decorative chase is not collision-based Snake.
 
 For a game demonstration, send `pace 450`, then `snake`, on separate lines.
 Expect an initial preview, a fixed legal route eating seven foods, growth from
-3 to 10 bars, wall collision, frozen blink, GAME/OVER and SCORE 7. This is scripted
-coverage, not a human player's result. It uses the same engine as PanelSnake,
+3 to 10 bars, wall collision, frozen blink, GAME/OVER and SCORE 7. This is a scripted
+demonstration, not a human player's result. It uses the same engine as PanelSnake,
 with programmed turns and food. snake-loop adds a one-second blank between
 rounds; the random-effects seed does not change the route. D11 stays silent.
 Upload PanelSnake again for manual play.

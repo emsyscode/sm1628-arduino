@@ -16,9 +16,9 @@ Complete [display wiring](01-connect.md). Game connections are:
 | Active buzzer stage | D11 | Transistor control through 10 kΩ, not direct buzzer power |
 | Joystick Z | Unused | No game function |
 
-The [circuit notes](circuit-inventory.md) separate confirmed nodes from the full
-control-stage drawing still being documented. These GPIO assignments do not
-establish an industrial joystick pinout or transistor terminal order.
+The [circuit inventory](circuit-inventory.md) lists the parts used in this build.
+It is not a complete joystick/buzzer wiring schematic. These GPIO assignments
+do not establish an industrial joystick pinout or transistor terminal order.
 
 Keep PanelSnake.ino and SnakeGame.h together in firmware/PanelSnake/. Open the
 .ino, select Uno/port and upload. Compatibility startup drives D1-D13 except D4
@@ -46,8 +46,8 @@ the adjacent vertical bar needs an approach from the opposite direction.
 
 Collision freezes/blinks the body, then shows approximate GAME, OVER and SCORE
 with its value. Serial gives the score clearly; seven-segment letters are
-approximations. The central colon stays off because its individual bit has not
-been assigned. Turning on the whole group would also enable other symbols.
+approximations. The game leaves the central colon off. Its display map does not select an
+individual colon; turning on the whole group would also enable other symbols.
 Release and press START for another round. A button held at boot must first
 be released; a press during play does not reset the current round.
 
@@ -75,13 +75,13 @@ Compare `j` output before adjusting kSwapAxes, kReverseX, kReverseY near the top
 of the sketch. Upload and recalibrate after a change. The supplied directions
 have left/up increasing voltage. Startup measures the actual centre.
 kEngage=30 and kRelease=18 ADC counts provide hysteresis; this game does not
-depend on a10mV threshold. Diagonals resolve to one direction. The5 ms software
-input schedule is not a measured end-to-end latency. JoystickTest's500 ms pause
+depend on a 10 mV threshold. Diagonals resolve to one direction. The 5 ms software
+input schedule is not a measured end-to-end latency. JoystickTest's 500 ms pause
 is for readable bench output, not the game input interval.
 
 D11 is HIGH for sound, LOW for silence. An active buzzer makes its own pitch:
 the code uses DC pulses, not tone(): 40 ms at start, 60 ms for food, 180 ms at end.
 Use the transistor stage and check its actual package pinout.
 
-Upload [PanelShowcase](filming-showcase.md) for effects/scripted replay; upload
+Upload [PanelShowcase](display-effects.md) for effects/scripted replay; upload
 PanelSnake again for manual play. See [validation](validation.md) for test scope.

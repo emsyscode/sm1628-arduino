@@ -1,7 +1,6 @@
 # Connector photographs
 
-Photographs and labelled versions supplied by José Luis Monteiro through the
-creator. Original JPEG copies are unchanged. The labelled JPEGs are compressed
+Photographs and labelled versions by José Luis Monteiro. Original JPEG copies are unchanged. The labelled JPEGs are compressed
 derivatives of the supplied PNG annotations; no connections or labels redrawn.
 Header A and B name these photographed layouts, not universal board revisions.
 

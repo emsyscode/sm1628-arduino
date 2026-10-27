@@ -7,7 +7,7 @@ command; `sendBurstByte` transmits bytes while the caller holds STB low.
 `showTestNumeral` builds a clean numeric frame. `loop` selects physical positions
 and numerals. It is the small display example, without game/input machinery.
 
-**ManualMap** adds a14-byte buffer, held selections and a bounded line parser.
+**ManualMap** adds a 14-byte buffer, held selections and a bounded line parser.
 Its normal renderers construct clean columns; `OriginalPatterns.h` contains
 only the optional mixed-payload compatibility diagnostic. Serial input is
 restored on D0 after whole-port initialization.
@@ -29,7 +29,7 @@ The nominal 5 V reference and printed decimals are not a precision measurement.
 
 **PanelSnake** separates display transport, frame construction, joystick
 calibration/hysteresis, button debounce, timed buzzer pulses, serial commands
-and the main phase machine. `SnakeGame.h` contains the49-cell game rules;
+and the main phase machine. `SnakeGame.h` contains the 49-cell game rules;
 hardware output is separate from those rules. `loop` advances input, game and
 display on independent clocks. Configuration is near the top; read the
 [game guide](snake-test.md) before changing axis signs or thresholds.

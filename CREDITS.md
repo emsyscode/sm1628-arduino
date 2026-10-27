@@ -11,6 +11,3 @@ hosting PDF copies are reference mirrors.
 
 Maintainers retain a frozen regression source under reference/ and a comparison
 fixture under tests/fixtures/. Start with README.md for the current tutorial.
-
-This repository has no distribution-license file yet. The authors should choose
-a license before public release; attribution alone does not grant one.

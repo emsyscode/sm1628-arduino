@@ -9,7 +9,7 @@ Tests compile the actual C++ for Uno and execute the AVR code with simulated
 GPIO/UART/ADC. They check frames and behavior, not electrical/thermal operation
 or camera readability.
 
-Install Arduino CLI, AVR core 1.8.6, Node.js22 and the pinned test dependency:
+Install Arduino CLI, AVR core 1.8.6, Node.js 22 and the pinned test dependency:
 
 ```text
 arduino-cli core install arduino:avr@1.8.6
@@ -22,8 +22,8 @@ comparison fixture, five tutorial sketches and engine check sketch.
 
 - Original-source hash remains unchanged; its comparator preserves all 380
   original transactions, sender timing and setup.
-- PanelDemo checks70 numeral/position combinations, physical order, zero
-  unintended icon bits and100 ms application holds.
+- PanelDemo checks 70 numeral/position combinations, physical order, zero
+  unintended icon bits and 100 ms application holds.
 - ManualMap checks start-before-next, clean/compatibility rendering, raw,
   ordered and individual-bit commands, wrapping and invalid-line behavior.
 - PanelSnake checks calibration, direction interpretation, 49-bar mapping,

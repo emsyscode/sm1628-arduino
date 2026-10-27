@@ -17,7 +17,7 @@ constexpr float kReferenceVolts = 5.0f;
 constexpr uint16_t kAdcMaxReading = 1023;
 
 void printReading(const __FlashStringHelper *label, int raw) {
-  // Preserve the original 0..1023 -> 0..reference endpoint conversion.
+  // Scale ADC endpoints 0..1023 to 0..reference volts.
   const float volts = raw * (kReferenceVolts / kAdcMaxReading);
 
   Serial.print(label);

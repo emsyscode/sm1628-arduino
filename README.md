@@ -26,7 +26,7 @@ the IC suffix alone does not call for a new map; changing the panel can.
 | [2. Run the first display test](docs/02-first-display.md) | Upload a small example and check the result | Count through numeric positions |
 | [3. Map your own panel](docs/manual-mapping.md) | Select columns and individual bits | Record your digit, segment and symbol map |
 | [4. Understand memory and commands](docs/04-memory.md) | Native versus swapped wiring, frame construction and transmission | Choose the bytes you send |
-| [5. Control numbers and effects](docs/filming-showcase.md) | Counting, carry, patterns and timing | Try repeatable display demonstrations |
+| [5. Control numbers and effects](docs/display-effects.md) | Counting, carry, patterns and timing | Try repeatable display demonstrations |
 
 The [reference panel map](docs/panel-map.md) applies these ideas to our assembled
 DVD panel: seven numeric digits and three symbol groups. It is one worked
@@ -150,7 +150,7 @@ It starts blank. Send one command per line:
 
 These examples use our panel map; adapt it after mapping another panel.
 No joystick is needed. For the remaining commands and expected behavior,
-see [display effects](docs/filming-showcase.md).
+see [display effects](docs/display-effects.md).
 
 ## What you need
 
@@ -185,6 +185,9 @@ to combine the driver with a joystick, START button and active buzzer. The
 [joystick test](firmware/JoystickTest) and [game sketch](firmware/PanelSnake)
 are separate from the display-only learning path. PanelShowcase also includes
 a repeatable scripted game demonstration.
+
+The game guide covers firmware and input/output assignments. The optional
+circuit inventory is a parts reference, not a complete joystick/buzzer schematic.
 
 ## Further help
 

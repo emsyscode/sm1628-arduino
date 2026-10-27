@@ -11,19 +11,19 @@ constexpr uint8_t kDisplayMode = 0x03;
 constexpr uint8_t kFullBrightness = 0x8F;
 constexpr uint8_t kFrameBytes = 14;
 
-// a..g masks derived ONLY from the first bit in each original byte pair.
-// Preserve inherited numeral shapes (including the original9 bottom-bar omission).
+// Numeral masks use bits 0..6 for segments a..g.
+// The font uses an open-bottom 9; its bottom bar is intentionally off.
 // Symbol columns are left clear; see docs/04-memory.md for the RAM layout.
 const uint8_t kNumeralMasks[10] = {0x3F, 0x6, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x67};
 constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
 
-// The original enabled Timer1 even though its active display test does not
-// use the clock values. Retain its register setup for transport compatibility.
+// Timer1 state is retained by the compatible Uno startup setup.
+// Display updates do not use these clock values.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
 void sendCommand(uint8_t value) {
-  // STB frames a single command. Keep the original command-specific timing.
+  // STB frames a single command. Keep the command-specific timing used by this sender.
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   for (uint8_t mask = 1; mask != 0; mask <<= 1) {

@@ -3,7 +3,7 @@
 
  HOW TO USE
  1. Use the tested panel wiring: D7 DATA, D8 CLK, D9 STB, common ground.
-    Keep the tested supply arrangement. D1..D13 retain legacy output setup:
+    Keep the tested supply arrangement. D1..D13 are configured as outputs:
     disconnect joystick/other peripherals on those pins. D0 is serial input.
  2. Upload for Arduino Uno. Open Serial Monitor: 9600 baud, Newline (or Both).
  3. It starts BLANK. First send: column 0 7
@@ -15,7 +15,7 @@
  6. For digits left to right, send: ordered
     This starts a fresh sequence with numeral 7, using the photo-derived map.
     n/p now steps only the seven numeric positions; it wraps at each end.
-    Send column 0 7 to return to the original raw-column diagnostic.
+    Send column 0 7 to return to raw-column stepping.
 
  WHY 7? It matches the photographed mapping test (top + two right bars).
  digit 8 lights all bars AFTER selecting a mode. Other panels need their own map.
@@ -35,13 +35,13 @@ constexpr uint8_t kFrameBytes = 14;
 
 #include "OriginalPatterns.h"
 
-// The original enabled Timer1 even though its active display test does not
-// use the clock values. Retain its register setup for transport compatibility.
+// Timer1 state is retained by the compatible Uno startup setup.
+// Display updates do not use these clock values.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
 void sendCommand(uint8_t value) {
-  // STB frames a single command. Keep the original command-specific timing.
+  // STB frames a single command. Keep the command-specific timing used by this sender.
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   for (uint8_t mask = 1; mask != 0; mask <<= 1) {

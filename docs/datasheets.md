@@ -8,16 +8,16 @@ part/revision on your panel; a mirror is not the IC manufacturer.
 
 | Document | Relevant pages | Link |
 |---|---|---|
-| SM1628, IGBG-IZV1.0, 13pages | p1 features; p2 pins; p5 memory; p6-7 commands | [PDF](https://taoic.oss-cn-hangzhou.aliyuncs.com/7860/product/xiaoliu888_1608197155000.pdf) |
-| SM1628B, 15pages | p3 pins; p4 memory; p5 data mode; p6 address/brightness; p7 serial format | [PDF](https://datasheet4u.com/pdf/791904/SM1628B.pdf) |
+| SM1628, IGBG-IZV1.0, 13 pages | p1 features; p2 pins; p5 memory; p6-7 commands | [PDF](https://taoic.oss-cn-hangzhou.aliyuncs.com/7860/product/xiaoliu888_1608197155000.pdf) |
+| SM1628B, 15 pages | p3 pins; p4 memory; p5 data mode; p6 address/brightness; p7 serial format | [PDF](https://datasheet4u.com/pdf/791904/SM1628B.pdf) |
 
 Both include seven-digit/ten-segment mode. The B command table on p5 identifies
-auto-increment and fixed-address writes; p6 sets RAM addresses0x00-0x0D.
+auto-increment and fixed-address writes; p6 sets RAM addresses 0x00-0x0D.
 Our [full-frame sender](04-memory.md) is a software update strategy, not a claim
 that partial protocol writes are unsupported.
 
-In these particular documents, SM1628 lists internal RC oscillation with pin1
-NC. SM1628B identifies pin1 as OSC with an external frequency-setting resistor
+In these particular documents, SM1628 lists internal RC oscillation with pin 1
+NC. SM1628B identifies pin 1 as OSC with an external frequency-setting resistor
 to ground, and describes improved electrostatic/power-interference protection.
 An external setting resistor is not necessarily an external oscillator module.
 Do not generalize revision differences beyond the documents you have checked.

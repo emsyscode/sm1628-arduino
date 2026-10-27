@@ -1,8 +1,8 @@
 /*
- PanelShowcase - filming/demo effects for our salvaged SM1628B panel.
+ PanelShowcase - display effects for our salvaged SM1628B panel.
  Display demonstration in the SM1628 / SM1628B driver tutorial.
  Uno: D7 DATA, D8 CLK, D9 STB; keep the tested supply/common ground.
- Legacy D1..D13 output setup is retained, except D4. D0 is serial RX. D4 START remains an input; D11
+ D1..D13 are outputs, except D4. D0 is serial RX. D4 START remains an input; D11
  active buzzer remains silent. No joystick needed.
 
  UPLOAD AND USE
@@ -81,7 +81,7 @@ const Cue kCues[] = {{OFF, 1500, 1, 0},           {DIGITS, 600, 7, 0},  {GROUPS,
 constexpr uint8_t kCueCount = sizeof(kCues) / sizeof(kCues[0]);
 
 void sendCommand(uint8_t value) {
-  // STB frames a single command. Keep the original command-specific timing.
+  // STB frames a single command. Keep the command-specific timing used by this sender.
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   for (uint8_t mask = 1; mask != 0; mask <<= 1) {

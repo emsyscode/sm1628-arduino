@@ -71,7 +71,7 @@ constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
 constexpr int kEngage = 30;
 constexpr int kRelease = 18;
 
-// Supplied voltage travel converted to approximate relative spans at nominal 5 V.
+// Measured voltage travel converted to approximate relative spans at nominal 5 V.
 // They only balance diagonal axis selection; startup measures actual centre.
 constexpr int kXPositiveSpan = 97;
 constexpr int kXNegativeSpan = 97;
@@ -124,7 +124,7 @@ unsigned long buzzerStartedAt = 0;
 uint16_t buzzerDurationMs = 0;
 
 void sendCommand(uint8_t value) {
-  // STB frames a single command. Keep the original command-specific timing.
+  // STB frames a single command. Keep the command-specific timing used by this sender.
   digitalWrite(kStrobePin, LOW);
   delayMicroseconds(1);
   for (uint8_t mask = 1; mask != 0; mask <<= 1) {
@@ -500,7 +500,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
   cli();
-  // Preserve legacy startup/Timer1 while isolating gameplay above it.
+  // Initialize Uno ports and Timer1; gameplay uses separate elapsed-time clocks.
   TCCR1A = 0;
   TCCR1B = 0;
   TCNT1 = 0;
