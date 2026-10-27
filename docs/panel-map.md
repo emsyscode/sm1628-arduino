@@ -1,43 +1,31 @@
-# Engineer's panel map
+# Reference DVD panel map
 
-Source: Jose Luis Monteiro's explanation relayed by the creator, 2026-10-26.
-The creator confirmed all numeric positions below are counted **from the right**.
-Original Portuguese: [preserved explanation](engineer-panel-explanation.pt.md).
+This table combines the engineer's group identification with photographed raw
+column tests. Engineer numeric positions count from the right. Firmware numeric
+positions below count from the left. Neither is an IC package-pin number.
 
-| Engineer's Grid label | Panel group |
-|---|---|
-| 1 | return, left colon, right colon, Dolby, DTS |
-| 2 | first numeric digit from right |
-| 3 | second numeric digit from right |
-| 4 | third numeric digit from right |
-| 5 | fourth numeric digit from right |
-| 6 | seventh numeric digit from right (leftmost) |
-| 7 | fifth numeric digit from right |
-| 8 | sixth numeric digit from right |
-| 9 | Wheels symbol |
-| 10 | DVD, VCD, MP3, PBC, Play, Pause, last Wheels symbol |
+| Physical function | Numeric position from left | Raw RAM column | Engineer Grid label |
+|---|---:|---:|---:|
+| Leftmost numeric digit | 1 | 0 | 6 |
+| Numeric digit | 2 | 1 | 8 |
+| Numeric digit | 3 | 7 | 7 |
+| Numeric digit | 4 | 2 | 5 |
+| Numeric digit | 5 | 3 | 4 |
+| Numeric digit | 6 | 4 | 3 |
+| Rightmost numeric digit | 7 | 5 | 2 |
+| Return, left/right colons, Dolby, DTS | - | 6 | 1 |
+| Wheel group | - | 8 | 9 |
+| DVD, VCD, MP3, PBC, Play, Pause, remaining wheel light | - | 9 | 10 |
 
-Numeric digits **left to right: Grid 6, 8, 7, 5, 4, 3, 2**.
+The engineer identifies the complete groups. The photographed `column 0 7`
+then `n` test establishes numeric positions and only the subset of icons enabled
+by the 7 mask. It does not identify every individual icon bit. In particular,
+an isolated central-colon bit is not assigned in the game.
 
-The panel has seven numeric positions and three symbol groups. The manufacturer
-swapped segment and grid/digit roles to obtain ten groups of seven segments,
-using a common-anode display in place of the native common-cathode arrangement.
-Existing panel wiring dictates the software map.
+Numeric lookup from left to right: `{0, 1, 7, 2, 3, 4, 5}`.
+Engineer Grid labels in the same physical order: `{6, 8, 7, 5, 4, 3, 2}`.
+Do not obtain one by adding/subtracting one from the other.
 
-The native memory has seven two-byte rows. Under the panel's transposed wiring,
-a displayed group is represented by a vertical bit column across those rows.
-Our implementation sends complete fourteen-byte frames to update the display.
-The chip protocol also supports addressed writes; full frames are our mapping
-and update strategy, not a claim that every partial protocol write is invalid.
-
-## Photographed raw-column correlation — 2026-10-26
-
-Creator ran column 0 7 followed by one n per photo. Observed numeric digits
-left to right use raw columns **0,1,7,2,3,4,5**. These correspond by physical
-position to the engineer Grid labels above; do not derive one by subtracting one.
-Raw6 lit return/both colons, raw8 three wheel wedges, raw9 DVD/VCD/MP3.
-The 7 pattern confirms the numeric positions and three bars, not all bars/icons.
-
-ManualMap now offers ordered mode using this map. Its new ordered stepping
-still needs a hardware run; raw-column selection has the photo evidence.
-[Instructions, expected outputs and troubleshooting](manual-mapping.md).
+For another panel, use [manual mapping](manual-mapping.md), retain your measured
+table and adapt only the relevant sketch. Reusing this lookup is appropriate
+only if your panel produces the same observed results.
