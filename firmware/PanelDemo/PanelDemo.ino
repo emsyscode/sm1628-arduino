@@ -1,4 +1,4 @@
-// Refactor of Jose Luis Monteiro's user-tested seven-digit panel sketch.
+// PanelDemo - numeric display example for the SM1628 / SM1628B tutorial.
 // Counts 0-9 on each numeric position, left to right, without symbol columns.
 // Board: Arduino Uno / ATmega328P, 16 MHz. No external display library required.
 #include <Arduino.h>

@@ -1,6 +1,6 @@
 /*
   PanelSnake - Snake on a salvaged seven-digit SM1628B panel.
-  Based on Jose Luis Monteiro's display transport and joystick test.
+  Optional application in the SM1628 / SM1628B driver tutorial.
 
   Connections
     D7: display DATA     D8: display CLK     D9: display STB

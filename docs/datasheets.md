@@ -1,5 +1,8 @@
 # Datasheets and exact revisions
 
+For the practical summary, start with [SM1628 and SM1628B](driver-variants.md).
+Both use the display programming taught in this tutorial.
+
 These are Sunmoon-authored documents hosted by public mirrors. Match the exact
 part/revision on your panel; a mirror is not the IC manufacturer.
 

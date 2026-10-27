@@ -1,6 +1,6 @@
 /*
  PanelShowcase - filming/demo effects for our salvaged SM1628B panel.
- Based on Jose Luis Monteiro's tested command/burst transport.
+ Display demonstration in the SM1628 / SM1628B driver tutorial.
  Uno: D7 DATA, D8 CLK, D9 STB; keep the tested supply/common ground.
  Legacy D1..D13 output setup is retained, except D4. D0 is serial RX. D4 START remains an input; D11
  active buzzer remains silent. No joystick needed.

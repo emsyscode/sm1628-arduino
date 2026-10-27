@@ -1,4 +1,4 @@
-# 5. Play Snake
+# Optional application: Snake
 
 Map and check your display first. The reference panel has seven numeric digits
 with seven bars each: 49 playable positions. The game targets an Uno and needs

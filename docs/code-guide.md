@@ -12,9 +12,20 @@ Its normal renderers construct clean columns; `OriginalPatterns.h` contains
 only the optional mixed-payload compatibility diagnostic. Serial input is
 restored on D0 after whole-port initialization.
 
+**PanelShowcase** builds on the same display transport and map to construct
+frames for counting, carry, sweeps, fills and other effects. Start with those
+renderers to see how an application changes a buffer without changing the
+driver protocol. Its serial commands select the effect and its update interval.
+
+These display examples use the same command path for SM1628 and SM1628B.
+Changing to a differently wired panel calls for a different frame/map, not a
+different driver-name string. See the [variant guide](driver-variants.md).
+
+## Optional game and input code
+
 **JoystickTest** reads A0/A1 and prints raw ADC and estimated voltage values.
-The500 ms delay is for readable bench output. It is not the game's input interval.
-The nominal5 V reference and printed decimals are not a precision measurement.
+The 500 ms delay is for readable bench output. It is not the game's input interval.
+The nominal 5 V reference and printed decimals are not a precision measurement.
 
 **PanelSnake** separates display transport, frame construction, joystick
 calibration/hysteresis, button debounce, timed buzzer pulses, serial commands
@@ -23,10 +34,12 @@ hardware output is separate from those rules. `loop` advances input, game and
 display on independent clocks. Configuration is near the top; read the
 [game guide](snake-test.md) before changing axis signs or thresholds.
 
-**PanelShowcase** constructs frames for each effect. `SnakeReplay.h` supplies
+PanelShowcase also includes a game demonstration. `SnakeReplay.h` supplies
 a fixed legal route and food positions using the same `SnakeGame.h`; it is a
 scripted demonstration, not an autonomous joystick player. The duplicated game
 header keeps both Arduino sketch folders self-contained; tests check equality.
+
+## Maintenance details
 
 The working Uno port/Timer1 setup is retained for compatibility. The timer's
 old flag is not the game's scheduler. Do not remove it, replace the sender or

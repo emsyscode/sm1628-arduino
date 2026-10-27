@@ -1,5 +1,9 @@
 # 1. Identify and connect the panel
 
+Both SM1628 and SM1628B use this interface. Read the
+[variant comparison](driver-variants.md) for their oscillator and protection
+differences; the panel wiring, not the B suffix, determines the visible map.
+
 Use an Arduino Uno and an assembled SM1628/SM1628B LED panel whose supply and
 signal labels you have identified. The photographed reference panel uses +5 V.
 Check an unfamiliar panel's actual supply requirements before powering it;
