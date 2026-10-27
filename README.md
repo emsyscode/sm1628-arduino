@@ -17,7 +17,7 @@ protection; see the [short comparison](docs/driver-variants.md).
 map your display before copying the reference panel's lookup table. Changing
 the IC suffix alone does not call for a new map; changing the panel can.
 
-## Learn the driver
+## Tutorial contents
 
 | Step | What you will learn | What you will achieve |
 |---|---|---|
@@ -31,6 +31,126 @@ the IC suffix alone does not call for a new map; changing the panel can.
 The [reference panel map](docs/panel-map.md) applies these ideas to our assembled
 DVD panel: seven numeric digits and three symbol groups. It is one worked
 example, not a universal panel configuration.
+
+## 1. Connect the panel
+
+For the reference +5 V panel, connect the following with power disconnected:
+
+| Uno / supply | Panel connection |
+|---|---|
+| D7 through 1 kΩ | DATA (`DA` or `D`) |
+| D8 through 1 kΩ | Clock (`CLK` or `C`) |
+| D9 through 1 kΩ | Strobe (`STB` or `S`) |
+| GND | Panel GND and supply ground |
+| Suitable +5 V panel supply | Panel +5 V input |
+| Unconnected | Infrared signal (`IR` or `R`) |
+
+![Reference panel connector](docs/images/header-5v-ir-gnd-clk-stb-data-labelled.jpg)
+
+Follow the labels, not connector positions or wire colours. Confirm an unfamiliar
+panel's supply requirements first. A separate supply must share ground with the
+Uno; do not connect independent +5 V sources together. The signal resistors
+are the values used in this build, not a universal level converter.
+See [other photographed connector order and wiring details](docs/01-connect.md).
+
+Start with only the display connected. PanelDemo configures D0–D13 as outputs;
+ManualMap restores D0 for serial input. Leave buttons and other peripherals
+disconnected from the driven pins during these tests.
+
+## 2. Upload and display numbers
+
+Use an **Arduino Uno / ATmega328P at 16 MHz** and Arduino IDE. No external
+Arduino library is required. Download and extract this repository; keep each
+sketch's header files alongside its `.ino`.
+
+For the reference panel, open `firmware/PanelDemo/PanelDemo.ino`, select Uno and
+the correct port, then upload. Each numeric position counts 0–9, starting at
+the left and progressing right. Each numeral lasts about 100 ms. After all
+seven positions, the display clears and repeats. Symbol groups stay off.
+
+If your panel has a different map, use the diagnostic below before adapting
+the numeric example. Different shapes or positions do not automatically mean
+the driver communication has failed. See [first-test results](docs/02-first-display.md).
+
+## 3. Find your panel's map
+
+Upload `firmware/ManualMap/ManualMap.ino`. Open Serial Monitor at **9600 baud**,
+with **Newline** or **Both NL & CR** selected. It starts blank.
+
+Send each command separately, followed by Enter:
+
+```text
+column 0 7
+n
+```
+
+**Send `column 0 7` first.** On our panel it lights a 7 on the leftmost numeric
+digit. Then `n` advances through raw RAM columns; `p` goes back. Each result
+stays lit so you can record it. Reset or `clear` cancels the selection.
+Raw column order includes symbols and is not left-to-right digit order.
+
+After selecting a column, `digit 8` lights all seven segment rows for that
+column. To check the reference panel in physical order, send `ordered`, then
+`n` or `p`. For an unfamiliar panel, first establish your own raw-column map;
+`ordered` uses our lookup table.
+
+Our seven numeric positions use columns **`0, 1, 7, 2, 3, 4, 5`**, left to right.
+That is the table used by the numeric examples. Individual-bit commands let
+you find symbol and segment assignments as well. Follow the
+[complete mapping procedure](docs/manual-mapping.md) before copying the map
+to a different panel.
+
+## 4. Understand what the driver receives
+
+Both variants use DATA, CLK and STB to receive commands and display bytes.
+The examples transmit least significant bit first. The commands used here are:
+
+| Byte | Purpose |
+|---|---|
+| `0x03` | Select native 7-digit/10-segment mode |
+| `0x40` | Select RAM writes with automatic address increment |
+| `0xC0` | Start writing at display RAM address `0x00` |
+| `0x80` | Turn the display off |
+| `0x8F` | Turn the display on at the maximum brightness setting |
+
+These are bytes sent by the sketch, not Serial Monitor commands.
+
+The IC has fourteen display-RAM bytes. Our panel manufacturer swapped the roles
+of digit and segment connections, using a common-anode arrangement to obtain
+**ten groups of seven lights**. Seven groups are numeric digits; three are
+symbols. The driver still uses its native 7×10 mode. Another panel can be
+wired differently even when it uses exactly the same IC.
+
+In our transposed map, each segment row occupies a pair of bytes. For example,
+to draw a 7 in raw column 0, begin with fourteen zero bytes and set bit 0 in
+bytes **0, 2 and 4**: the top, upper-right and lower-right bars. The third
+numeric digit is raw column 7, so the same shape uses bit 7 in those bytes.
+Preserve the other bits when adding a second digit.
+
+The working sender writes a complete fourteen-byte frame for each update.
+This makes the transposed map predictable; it is not a restriction forbidding
+the IC's addressed writes. The [memory guide](docs/04-memory.md) includes the
+address table, frame-building code and transaction sequence.
+
+## 5. Control numbers and effects
+
+Upload `firmware/PanelShowcase/PanelShowcase.ino`, keeping its headers together.
+Open Serial Monitor at **115200 baud**, with **Newline** or **Both** selected.
+It starts blank. Send one command per line:
+
+| Command | Expected result on the reference panel |
+|---|---|
+| `digits` | An 8 sweeps through numeric positions |
+| `count` | All numeric positions count 0–9 together |
+| `value 9995`, then `carry` | Count upward through the carry into 10000 |
+| `bars` | Matching segment rows light across the digits |
+| `all` / `blink` | Hold all groups on / flash them |
+| `pace 250` | Set effect steps to 250 ms |
+| `stop` | Blank the display and cancel the effect |
+
+These examples use our panel map; adapt it after mapping another panel.
+No joystick is needed. For the remaining commands and expected behavior,
+see [display effects](docs/filming-showcase.md).
 
 ## What you need
 
