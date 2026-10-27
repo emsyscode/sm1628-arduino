@@ -48,6 +48,11 @@ This guide does not establish the current demand of an arbitrary panel or
 promise that USB/Uno 5 V can power it. If using a separate panel supply, connect
 its ground to Uno ground; avoid tying independent +5 V sources together blindly.
 
+Our build uses an external +5 V DC supply instead of the Uno +5 V pin. A 470 µF,
+35 V capacitor is connected across that supply: positive to +5 V, negative to
+GND. See [the power and control wiring](circuit-inventory.md) for the complete
+reference-build connections.
+
 ## Start with only the display attached
 
 PanelDemo sets all D0-D13 pins as outputs. ManualMap restores D0 to serial RX,

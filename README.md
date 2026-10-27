@@ -51,6 +51,9 @@ Follow the labels, not connector positions or wire colours. Confirm an unfamilia
 panel's supply requirements first. A separate supply must share ground with the
 Uno; do not connect independent +5 V sources together. The signal resistors
 are the values used in this build, not a universal level converter.
+Our build uses an external +5 V DC supply, with a 470 µF capacitor across its
+rails: positive to +5 V and negative to GND. The capacitor is rated 35 V; it
+does not set the supply voltage.
 See [other photographed connector order and wiring details](docs/01-connect.md).
 
 Start with only the display connected. PanelDemo configures D0–D13 as outputs;
@@ -186,8 +189,9 @@ to combine the driver with a joystick, START button and active buzzer. The
 are separate from the display-only learning path. PanelShowcase also includes
 a repeatable scripted game demonstration.
 
-The game guide covers firmware and input/output assignments. The optional
-circuit inventory is a parts reference, not a complete joystick/buzzer schematic.
+The [reference circuit guide](docs/circuit-inventory.md) includes the external
+supply, capacitor polarity, joystick track resistors, START network and
+transistor-driven active buzzer, with a connection diagram.
 
 ## Further help
 

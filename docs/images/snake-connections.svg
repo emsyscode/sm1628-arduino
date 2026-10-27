@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="960" viewBox="0 0 1320 960" role="img" aria-labelledby="title desc">
+<title id="title">Snake control circuit connections</title>
+<desc id="desc">External five volt supply with 470 microfarad capacitor across its rails. Each joystick potentiometer has a one kilohm resistor at each end, one to five volts and one to ground, with wipers connected to A0 and A1. D11 connects through ten kilohms to the base of a 2N2222 NPN transistor. Its emitter goes to ground, collector to buzzer negative, and buzzer positive to five volts. D4 uses an internal pull-up, a normally open switch with ten nanofarads across it, and 680 ohms from the switched node to ground. All ground labels connect together.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#66d3c6"/></marker></defs>
+<rect width="1320" height="960" rx="16" fill="#101b25"/>
+<g font-family="Arial, sans-serif" fill="#edf5fa" font-size="20">
+<text x="34" y="42" font-size="28" font-weight="700">Snake — circuit connections</text>
+<g fill="#172936" stroke="#38505f"><rect x="24" y="66" width="610" height="318" rx="12"/><rect x="654" y="66" width="642" height="426" rx="12"/><rect x="24" y="404" width="610" height="486" rx="12"/><rect x="654" y="512" width="642" height="378" rx="12"/></g>
+<text x="46" y="105" font-size="23">External supply</text>
+<g stroke="#ef8377" stroke-width="3" fill="none"><path d="M64 168 H568"/><path d="M310 168 V222"/></g>
+<text x="64" y="149" fill="#ef8377">+5 V DC</text>
+<g stroke="#a5b9c5" stroke-width="3" fill="none"><path d="M64 310 H568"/><path d="M310 242 V310"/></g>
+<text x="64" y="340" fill="#c2d2dc">GND</text>
+<g stroke="#edf5fa" stroke-width="4"><path d="M286 222 H334 M286 242 H334"/></g>
+<text x="275" y="208">+</text><text x="350" y="226">470 µF</text><text x="350" y="255" fill="#c2d2dc">35 V rating</text>
+<text x="64" y="369" font-size="17" fill="#c2d2dc">Supply rail is separate from the Uno +5 V pin.</text>
+
+<text x="678" y="105" font-size="23">Active buzzer</text>
+<path d="M1090 160 V186" stroke="#ef8377" stroke-width="3" fill="none"/>
+<text x="1090" y="145" text-anchor="middle" fill="#ef8377">+5 V</text>
+<rect x="1043" y="186" width="94" height="68" rx="8" fill="#243e50" stroke="#edf5fa" stroke-width="2"/>
+<text x="1060" y="208" font-size="18">+</text><text x="1060" y="246" font-size="18">−</text>
+<text x="1150" y="226" font-size="18">Buzzer</text>
+<g stroke="#66d3c6" stroke-width="3" fill="none"><path d="M1090 254 V300 L1050 326 M1050 315 V361 M1050 350 L1090 392"/><path d="M710 338 H817 M895 338 H1050"/></g>
+<rect x="817" y="326" width="78" height="24" fill="#243e50" stroke="#edf5fa" stroke-width="2"/>
+<circle cx="1065" cy="338" r="49" fill="none" stroke="#a5b9c5" stroke-width="2"/>
+<path d="M1072 373 L1086 388" stroke="#66d3c6" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M1090 392 V439" stroke="#a5b9c5" stroke-width="3"/>
+<text x="710" y="316">D11</text><text x="856" y="313" text-anchor="middle">10 kΩ</text>
+<text x="1012" y="323" font-size="17">B</text><text x="1106" y="292" font-size="17">C</text><text x="1106" y="399" font-size="17">E</text>
+<text x="958" y="427" font-size="18">2N2222</text><text x="1090" y="466" text-anchor="middle" fill="#c2d2dc">GND</text>
+<text x="678" y="480" font-size="16" fill="#c2d2dc">B / C / E identify terminals, not package pin order.</text>
+
+<text x="46" y="445" font-size="23">Joystick — X and Y</text>
+<g stroke="#ef8377" stroke-width="3" fill="none"><path d="M170 505 V537 M410 505 V537"/></g>
+<text x="170" y="491" text-anchor="middle" fill="#ef8377">+5 V</text><text x="410" y="491" text-anchor="middle" fill="#ef8377">+5 V</text>
+<g fill="#243e50" stroke="#edf5fa" stroke-width="2"><rect x="158" y="537" width="24" height="49"/><rect x="398" y="537" width="24" height="49"/></g>
+<text x="194" y="568">1 kΩ</text><text x="434" y="568">1 kΩ</text>
+<g stroke="#66d3c6" stroke-width="3" fill="none"><path d="M170 586 V620 M410 586 V620"/></g>
+<g fill="#243e50" stroke="#edf5fa" stroke-width="2"><rect x="158" y="620" width="24" height="100"/><rect x="398" y="620" width="24" height="100"/></g>
+<text x="96" y="676" font-size="22">X</text><text x="336" y="676" font-size="22">Y</text>
+<g stroke="#66d3c6" stroke-width="3" fill="none"><path d="M270 670 H185" marker-end="url(#arrow)"/><path d="M510 670 H425" marker-end="url(#arrow)"/><path d="M170 720 V750 M410 720 V750"/></g>
+<text x="270" y="655" text-anchor="end">A0</text><text x="510" y="655" text-anchor="end">A1</text>
+<g fill="#243e50" stroke="#edf5fa" stroke-width="2"><rect x="158" y="750" width="24" height="49"/><rect x="398" y="750" width="24" height="49"/></g>
+<text x="194" y="780">1 kΩ</text><text x="434" y="780">1 kΩ</text>
+<g stroke="#a5b9c5" stroke-width="3" fill="none"><path d="M170 799 V827 M410 799 V827"/></g>
+<text x="170" y="855" text-anchor="middle" fill="#c2d2dc">GND</text><text x="410" y="855" text-anchor="middle" fill="#c2d2dc">GND</text>
+<text x="46" y="880" font-size="16" fill="#c2d2dc">Arrows are wipers. Physical terminal order depends on the joystick.</text>
+
+<text x="678" y="552" font-size="23">START — internal pull-up on D4</text>
+<g stroke="#66d3c6" stroke-width="3" fill="none"><path d="M712 660 H845 M845 660 V606 H883 M945 606 H1000 V660 H1060"/><path d="M845 660 V723 H908 M928 723 H1000 V660"/></g>
+<text x="710" y="643">D4</text>
+<circle cx="887" cy="606" r="4" fill="#edf5fa"/><circle cx="941" cy="606" r="4" fill="#edf5fa"/>
+<path d="M887 606 L932 582" stroke="#edf5fa" stroke-width="3"/>
+<text x="912" y="580" text-anchor="middle" font-size="16">N.O.</text>
+<path d="M908 706 V740 M928 706 V740" stroke="#edf5fa" stroke-width="4"/>
+<text x="918" y="777" text-anchor="middle">10 nF</text>
+<rect x="1060" y="648" width="72" height="24" fill="#243e50" stroke="#edf5fa" stroke-width="2"/>
+<path d="M1132 660 H1207" stroke="#a5b9c5" stroke-width="3"/>
+<text x="1096" y="635" text-anchor="middle">680 Ω</text><text x="1207" y="691" text-anchor="middle" fill="#c2d2dc">GND</text>
+<text x="678" y="850" font-size="17" fill="#c2d2dc">10 nF is across the switch, before the 680 Ω resistor.</text>
+<text x="34" y="929" font-size="18" fill="#66d3c6">All GND labels connect together, including Uno and panel ground. Display signals: D7 / D8 / D9 through 1 kΩ each.</text>
+</g>
+</svg>

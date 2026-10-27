@@ -16,9 +16,10 @@ Complete [display wiring](01-connect.md). Game connections are:
 | Active buzzer stage | D11 | Transistor control through 10 kΩ, not direct buzzer power |
 | Joystick Z | Unused | No game function |
 
-The [circuit inventory](circuit-inventory.md) lists the parts used in this build.
-It is not a complete joystick/buzzer wiring schematic. These GPIO assignments
-do not establish an industrial joystick pinout or transistor terminal order.
+Follow the [parts and wiring guide](circuit-inventory.md) for the external +5 V
+supply, capacitor polarity, joystick resistors, START network and 2N2222 buzzer
+stage. All grounds are common. Identify the joystick terminals and transistor
+package leads before connecting them; the GPIO table is not a package pinout.
 
 Keep PanelSnake.ino and SnakeGame.h together in firmware/PanelSnake/. Open the
 .ino, select Uno/port and upload. Compatibility startup drives D1-D13 except D4

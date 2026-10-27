@@ -2,8 +2,9 @@
 
 The reference panel and joystick-controlled game have a working hardware
 demonstration. That establishes this build's operation, not compatibility with
-every panel or an optical measurement of every feature. Individual icon bits
-and the full control-stage drawing have separate documented limits.
+every panel or an optical measurement of every feature. The circuit guide
+records this build's connections; another panel still needs its own map and
+electrical checks. The game leaves the central-colon group unselected.
 
 Tests compile the actual C++ for Uno and execute the AVR code with simulated
 GPIO/UART/ADC. They check frames and behavior, not electrical/thermal operation

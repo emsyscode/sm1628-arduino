@@ -10,3 +10,7 @@ Unannotated originals: [Header A](header-5v-ir-gnd-clk-stb-data-original.jpg),
 driver-and-panel.svg is an original tutorial diagram. It summarizes the shared
 display programming, documented variant differences and panel-specific mapping.
 It is not a pin-by-pin wiring schematic or third-party component artwork.
+
+snake-connections.svg is an original logical connection diagram of the power,
+joystick, active-buzzer and START circuits described by José Luis Monteiro.
+Transistor B/C/E labels identify terminals, not their physical lead order.
