@@ -1,63 +1,58 @@
-# SM1628 panel — working-source baseline
+# SM1628 / SM1628B with Arduino Uno
 
-Based on Jose Luis Monteiro's original sketch, preserved byte-for-byte under
-reference/WorkingPanel. Earlier generated examples failed on this salvaged
-panel and remain archived. The creator confirmed the earlier refactor works; it is preserved as LegacyPanelDemo. The corrected numeric-only PanelDemo awaits a hardware retest.
+Learn to identify a salvaged display panel's connections, map its LEDs, display
+numbers and build a seven-segment Snake game. Start with the display; the game
+and demonstration effects are optional projects on top of it.
 
-## First Snake hardware test
+The examples are based on **José Luis Monteiro's working SM1628B DVD-panel code**.
+They target an **Arduino Uno / ATmega328P at 16 MHz**. No external Arduino library
+is required. Node.js is only for the automated tests, not for using the sketches.
 
-[PanelSnake sketch](firmware/PanelSnake/PanelSnake.ino) and
-[step-by-step bench guide](docs/snake-test.md) are ready as an experimental test.
-Uno: panel D7/D8/D9, joystick signals A0/A1. Keep the tested supply/divider.
-Serial Monitor 115200: hold joystick centred for calibration, then m to check
-bars, j to check input directions, then START or serial s to play. Read the guide before upload.
-Sound is enabled on D11; see the game guide for buzzer settings.
-Creator confirms the joystick-controlled game works on hardware. START is now a button between D4 and GND (internal pull-up); joystick no longer starts rounds. This button update awaits hardware testing.
-The cleaned standalone [joystick reader](firmware/JoystickTest/JoystickTest.ino)
-is also included (115200 baud, readings every 500 ms).
+![Reference panel connector](docs/images/header-5v-ir-gnd-clk-stb-data-labelled.jpg)
 
-## Filming routines
+## Follow the tutorial
 
-Open [PanelShowcase](firmware/PanelShowcase/PanelShowcase.ino). Serial115200, Newline/Both. Starts blank. Send digits for a sweep, count for synchronized digits, or value 9995 then carry for decimal carry. Send demo for the full46.7s effects sequence, loop to repeat, hold to freeze, stop to blank. For scripted Snake playback, send pace 450 then snake (one round) or snake-loop (repeats); no joystick needed. Keep both headers with the showcase sketch. [Commands and recording guide](docs/filming-showcase.md). Upload PanelSnake again to return to the game. New showcase hardware/filming test is pending.
+| Step | What you will do | Expected result |
+|---|---|---|
+| [1. Identify and connect the panel](docs/01-connect.md) | Match labels, supply, ground and three control signals | Wiring checked before upload |
+| [2. Run the first display test](docs/02-first-display.md) | Upload PanelDemo for this panel, or ManualMap for an unknown map | Numbers or one selected position light |
+| [3. Map your own panel](docs/manual-mapping.md) | Select columns and individual bits, then record physical positions | Your own digit/segment map |
+| [4. Understand the display memory](docs/04-memory.md) | Build a 14-byte frame without disturbing other groups | An explanation of why the map matters |
+| [5. Play Snake](docs/snake-test.md) | Check bars and joystick, start a round and change speed | A playable 49-position game |
+| [6. Try display effects](docs/filming-showcase.md) | Sweep, count, carry, blink or run a scripted game | Repeatable visual demonstrations |
 
-## Map the panel manually
+**Same driver does not mean same panel.** A panel manufacturer can connect the
+display differently, swap the digit/segment roles, reorder digits or allocate
+bits to icons. The transport may be reusable while the visible map is different.
+Our panel has seven numeric positions and three symbol groups. It is not a
+universal wiring profile. See the [reference map](docs/panel-map.md).
 
-Open [firmware/ManualMap/ManualMap.ino](firmware/ManualMap/ManualMap.ino)
-in Arduino IDE, select Arduino Uno and upload with the tested wiring.
-Open Serial Monitor at **9600 baud**, with **Newline** or **Both NL & CR**.
+This tutorial writes LED display RAM over the three-wire interface; the selected
+Uno pins are ordinary GPIO, not a requirement to use hardware-SPI pins. The IC's
+key-scan read function and infrared decoding are outside these examples. START
+is read directly by the Uno on D4; the panel's IR connection is unused.
 
-FIRST send `column 0 7`. Expect 7 on the leftmost digit. THEN send 
-` when ready. Each selection stays lit until
-another command. Reset/clear cancels the selection; n/p needs a new selection first. Send `ordered` to start a left-to-right numeric sequence with 7, then n/p to step (wrapping at either end). Use `slot 0 7` for clean raw slot0; `legacy-slot 0 7` explicitly reproduces the old digit+symbol pattern, or `bit 0 0`
-to isolate a single RAM bit. [All commands and recording instructions](docs/manual-mapping.md).
+## Choose a sketch
 
-Arduino D7 = DATA, D8 = CLK, D9 = STB; these are GPIO assignments, not connector pins.
-The inherited setup owns D1..D13 as outputs; ManualMap restores D0 to input
-for serial reception. Do not add joystick/peripheral connections to those pins.
-Keep the existing tested supply arrangement.
+| Sketch folder | Purpose | Serial Monitor |
+|---|---|---|
+| [PanelDemo](firmware/PanelDemo) | Small automatic numeric display example | Not required |
+| [ManualMap](firmware/ManualMap) | Hold and inspect individual columns/bits | 9600 baud; Newline or Both |
+| [JoystickTest](firmware/JoystickTest) | Read the two analog inputs | 115200 baud |
+| [PanelSnake](firmware/PanelSnake) | Joystick-controlled Snake | 115200 baud; pace commands need Enter |
+| [PanelShowcase](firmware/PanelShowcase) | Display effects and scripted Snake | 115200 baud; Newline or Both |
 
-## Other tests and references
+Download the repository ZIP and extract it, then open the `.ino` inside the
+matching sketch folder. Keep any `.h` files beside that `.ino`. Select **Arduino
+Uno** and the correct port, then upload. Uploading another sketch replaces the
+previous program on the board. It does not install a second running application.
 
-- [Circuit inventory](docs/circuit-inventory.md): resistor/capacitor values, joystick terminals, START network and 2N2222 buzzer driver.
+**Pin ownership:** these sketches preserve the working implementation's
+whole-port initialization. Display diagnostics drive D0-D13 as outputs, with
+D0 restored as serial input in ManualMap. PanelSnake additionally restores D4
+as START input. Read the wiring guide before attaching other peripherals.
+This is not drop-in firmware for other Arduino architectures.
 
-- [PanelDemo](firmware/PanelDemo/PanelDemo.ino): corrected numeric-only loop, seven digits left to right.
-- [LegacyPanelDemo](firmware/LegacyPanelDemo/LegacyPanelDemo.ino): exact former loop with inherited icon bits, for comparison only.
-- [Symbol-bit correction explained](docs/symbol-bit-correction.md).
-- [SlotMap](firmware/SlotMap/SlotMap.ino): earlier timed, one-pass diagnostic.
-- [Engineer panel map](docs/panel-map.md): numeric digits left to right are
-  **Grid 6, 8, 7, 5, 4, 3, 2**, plus three symbol groups. Raw numeric columns left to right are **0,1,7,2,3,4,5**.
-- [Original Portuguese explanation](docs/engineer-panel-explanation.pt.md).
-- [Datasheet sources and revisions](docs/datasheets.md).
-- [Baseline details](docs/baseline.md), [walkthrough](docs/walkthrough.md),
-  [validation](docs/validation.md), [earlier code archive](archive/README.md).
-
-Raw RAM columns and source slots are separate indices from the engineer's
-Grid labels. The numeric map is established by the photographed column-7-pattern test; remaining bars/icons need separate testing.
-ManualMap compiles and passes simulated UART/GPIO checks; its hardware test
-is pending. It does not modify the accepted PanelDemo.
-
-PanelSnake is the experimental game; the other sketches are display/input diagnostics. The computer prototype,
-joystick animations and video script remain in the existing project repos.
-No public release or new distribution license is claimed by this private repo.
-
-
+[Troubleshooting](docs/troubleshooting.md) · [Circuit parts](docs/circuit-inventory.md)
+· [Datasheets](docs/datasheets.md) · [How the code is organized](docs/code-guide.md)
+· [Tests](docs/validation.md) · [Credits](CREDITS.md)

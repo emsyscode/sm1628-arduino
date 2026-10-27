@@ -1,4 +1,4 @@
-name: Compare against working panel sketch
+name: Compile and check panel examples
 on: [push, pull_request]
 permissions:
   contents: read
@@ -16,13 +16,11 @@ jobs:
       - name: Compile untouched reference, legacy comparison and numeric-only demo
         run: |
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/reference reference/WorkingPanel/SM1628B_Panel_DVD_Reader_7digits_sanake_v0
-          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor firmware/LegacyPanelDemo
+          arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/refactor tests/fixtures/LegacyPanelDemo
           arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/numeric firmware/PanelDemo
-      - name: Compile one-pass mapping diagnostic
-        run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/slot-map firmware/SlotMap
       - name: Compile manual mapping diagnostic
         run: arduino-cli compile --fqbn arduino:avr:uno --warnings all --build-path build/manual firmware/ManualMap
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm test
 
       - run: node tests/manual-map.cjs build/manual/ManualMap.ino.hex

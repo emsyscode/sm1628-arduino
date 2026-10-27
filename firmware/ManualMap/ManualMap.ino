@@ -10,8 +10,8 @@
     Expect a 7 on the LEFTMOST numeric digit of this particular panel.
  4. Then send n (next) or p (previous). Each selection holds until changed.
     Raw column order is NOT physical digit order; it also reaches symbols.
- 5. slot N D is now clean. legacy-slot N D explicitly reproduces the old
-    digit+symbol payload. column 0 7 and ordered already used clean frames.
+ 5. slot N D selects a clean numeric shape. legacy-slot N D explicitly selects
+    the mixed numeral/icon compatibility pattern; use column/ordered normally.
  6. For digits left to right, send: ordered
     This starts a fresh sequence with numeral 7, using the photo-derived map.
     n/p now steps only the seven numeric positions; it wraps at each end.
@@ -21,8 +21,6 @@
  digit 8 lights all bars AFTER selecting a mode. Other panels need their own map.
  See docs/manual-mapping.md for expected results and troubleshooting.
 */
-// Changes are limited to manual frame selection, serial RX and command parsing.
-// LegacyPanelDemo and the untouched original remain exact behavior references.
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <ctype.h>
@@ -35,36 +33,10 @@ constexpr uint8_t kDisplayMode = 0x03;
 constexpr uint8_t kFullBrightness = 0x8F;
 constexpr uint8_t kFrameBytes = 14;
 
-// LEGACY payloads: second bytes include icon bits, not pure numeral strokes.
-// Normal slot/column/ordered extract only the first-bit a..g shape.
-// Only the explicit legacy-slot command transmits both inherited bytes.
-// Each pair corresponds to a,b,c,d,e,f,g in source order.
-// Do not replace the second bytes with zeros or use a generic numeral font.
-const uint8_t kLegacyPatterns[10][kFrameBytes] = {
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010,
-     0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000000, 0b00000010},  // 0
-    {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010,
-     0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010},  // 1
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000000, 0b00000010, 0b00000001, 0b00000010,
-     0b00000001, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010},  // 2
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010,
-     0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000001, 0b00000010},  // 3
-    {0b00000000, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010,
-     0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010},  // 4
-    {0b00000001, 0b00000010, 0b00000000, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010,
-     0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010},  // 5
-    {0b00000001, 0b00000010, 0b00000000, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010,
-     0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010},  // 6
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010,
-     0b00000000, 0b00000010, 0b00000000, 0b00000010, 0b00000000, 0b00000010},  // 7
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000001, 0b00000010,
-     0b00000001, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010},  // 8
-    {0b00000001, 0b00000010, 0b00000001, 0b00000000, 0b00000001, 0b00000010, 0b00000000, 0b00000010,
-     0b00000000, 0b00000010, 0b00000001, 0b00000010, 0b00000001, 0b00000010},  // 9
-};
+#include "OriginalPatterns.h"
 
 // The original enabled Timer1 even though its active display test does not
-// use the clock values. Keep that setup for this first behavior comparison.
+// use the clock values. Retain its register setup for transport compatibility.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
@@ -428,7 +400,7 @@ void executeLine() {
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);  // Preserved from the working setup; no new serial output.
+  Serial.begin(9600);  // Commands and status use the Serial Monitor at 9600 baud.
   cli();
   TCCR1A = 0;
   TCCR1B = 0;

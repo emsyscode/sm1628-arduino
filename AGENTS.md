@@ -1,25 +1,27 @@
-# Working-panel development rules
+# Tutorial maintenance
 
-The source of truth is the user-supplied working sketch under reference/WorkingPanel.
-SHA-256: 4E9521DC761201B3C6FEB347DB51230398487458F13151BA866038D02293B9B4.
-Do not edit that file. Keep its byte-level identity checked in CI.
+Preserve the working Uno implementation and attribution to José Luis Monteiro.
+The source under reference/WorkingPanel is immutable; its SHA-256 remains
+4E9521DC761201B3C6FEB347DB51230398487458F13151BA866038D02293B9B4.
+The exact comparator is tests/fixtures/LegacyPanelDemo, not a user example.
 
-The exact accepted comparison is firmware/LegacyPanelDemo. Active PanelDemo is now the explicitly corrected numeric-only physical-order loop; ManualMap slot is clean, and legacy-slot reproduces inherited icon bits.
-Keep sender timing, command order, pattern bytes, brightness, scan-slot order,
-per-frame blanking and register setup until a particular change has passed a
-separate hardware comparison. Record validation per revision in docs/validation.md and the production project state, not in source comments.
-Do not infer a panel connector map or physical digit order from generic fonts.
+Keep sender timings, packet bytes/order, brightness, blanking and port/register
+setup until a separately justified hardware comparison supports a change.
+Do not silently change input pin ownership while cleaning source formatting.
+START=D4, active-buzzer transistor control=D11,DATA=D7,CLK=D8,STB=D9,A0/A1 axes.
+Never infer a connector pin order, hidden circuit node or panel map from a
+generic part. Follow the engineer explanation, exact datasheets and measurements.
 
-The reference's whole-port setup owns Uno D0..D13; never silently combine it
-with joystick/button connections. Remove that setup only as an explicit,
-separately tested change.
-No disabled-by-default example guards in the primary baseline demonstration.
-Distinguish "creator reports original works", "refactor trace matches", and
-"creator has tested refactor on hardware".
-Do not add game, key reading, clock demo or generalized family support until
-the display baseline is accepted. Preserve attribution and original sources.
+Teach identification -> wiring -> first output -> mapping -> memory -> projects.
+Keep tutorials sequential, with exact commands and expected results. Raw RAM
+columns, physical digits and engineer Grid labels are different namespaces.
+Comments explain purpose and constraints; status/history belongs in tests/docs,
+not temporary 'untested' source comments. Use readable multiline formatting.
+Keep runtime logic separate from rendering and protocol; avoid new abstractions
+that make the small examples harder to follow. Keep Arduino folders self-contained.
 
-Creator-authorized correction2026-10-26: normal numeral paths must not copy inherited second-byte icon masks. Preserve exact payloads only in the untouched reference, LegacyPanelDemo and explicit legacy-slot reproduction. Raw symbol-column tests remain legitimate. Explain setup, first command, expected result, and whether indices mean raw columns or physical digits in source and external docs. See docs/symbol-bit-correction.md.
-
-Creator style preference2026-10-26: use readable multi-line formatting and blank lines between functions/logical blocks. Apply .clang-format to firmware only; never reformat the byte-preserved supplied reference. Source comments explain wiring, operation and rationale; do not embed temporary untested/pending status or development disclaimers. Keep validation status in versioned external documentation. START=D4, buzzer=D11.
-
+Run relevant compiled AVR/GPIO/UART tests for source changes. Compiles and
+simulation are not optical/electrical hardware validation. Keep developer build
+results in docs/validation.md, not the main tutorial narrative. Do not add failed
+historical drivers, production scripts, raw footage or internal filming notes.
+Retain independent original sources and code credits even when pruning history.

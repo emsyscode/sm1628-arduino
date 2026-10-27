@@ -1,5 +1,5 @@
 // Refactor of Jose Luis Monteiro's user-tested seven-digit panel sketch.
-// Keeps its active digit-test sequence, GPIO setup, packet bytes and delays.
+// Counts 0-9 on each numeric position, left to right, without symbol columns.
 // Board: Arduino Uno / ATmega328P, 16 MHz. No external display library required.
 #include <Arduino.h>
 #include <avr/interrupt.h>
@@ -13,12 +13,12 @@ constexpr uint8_t kFrameBytes = 14;
 
 // a..g masks derived ONLY from the first bit in each original byte pair.
 // Preserve inherited numeral shapes (including the original9 bottom-bar omission).
-// The raw icon bytes remain in the untouched reference and LegacyPanelDemo.
+// Symbol columns are left clear; see docs/04-memory.md for the RAM layout.
 const uint8_t kNumeralMasks[10] = {0x3F, 0x6, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x67};
 constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
 
 // The original enabled Timer1 even though its active display test does not
-// use the clock values. Keep that setup for this first behavior comparison.
+// use the clock values. Retain its register setup for transport compatibility.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
