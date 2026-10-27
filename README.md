@@ -1,58 +1,73 @@
-# SM1628 / SM1628B with Arduino Uno
+# SM1628 and SM1628B — Arduino driver tutorial
 
-Learn to identify a salvaged display panel's connections, map its LEDs, display
-numbers and build a seven-segment Snake game. Start with the display; the game
-and demonstration effects are optional projects on top of it.
+Connect an LED panel to an Arduino Uno, understand the driver's commands and
+display memory, find your panel's segment map, and control numbers and symbols.
+This is José Luis Monteiro's updated driver tutorial, developed and tested
+together with TidusM.
 
-The examples are based on **José Luis Monteiro's working SM1628B DVD-panel code**.
-They target an **Arduino Uno / ATmega328P at 16 MHz**. No external Arduino library
-is required. Node.js is only for the automated tests, not for using the sketches.
+**SM1628 or SM1628B? Both use the programming approach taught here.** The same
+three-wire interface, display commands and 14-byte RAM layout apply to these
+examples. There is no separate B-version sketch or variant selector. The main
+hardware differences are the oscillator connection and the B variant's improved
+protection; see the [short comparison](docs/driver-variants.md).
 
-![Reference panel connector](docs/images/header-5v-ir-gnd-clk-stb-data-labelled.jpg)
+![Both drivers use the same interface; the panel determines the display map](docs/images/driver-and-panel.svg)
 
-## Follow the tutorial
+**Same driver does not mean same panel wiring.** Identify your connector and
+map your display before copying the reference panel's lookup table. Changing
+the IC suffix alone does not call for a new map; changing the panel can.
 
-| Step | What you will do | Expected result |
+## Learn the driver
+
+| Step | What you will learn | What you will achieve |
 |---|---|---|
-| [1. Identify and connect the panel](docs/01-connect.md) | Match labels, supply, ground and three control signals | Wiring checked before upload |
-| [2. Run the first display test](docs/02-first-display.md) | Upload PanelDemo for this panel, or ManualMap for an unknown map | Numbers or one selected position light |
-| [3. Map your own panel](docs/manual-mapping.md) | Select columns and individual bits, then record physical positions | Your own digit/segment map |
-| [4. Understand the display memory](docs/04-memory.md) | Build a 14-byte frame without disturbing other groups | An explanation of why the map matters |
-| [5. Play Snake](docs/snake-test.md) | Check bars and joystick, start a round and change speed | A playable 49-position game |
-| [6. Try display effects](docs/filming-showcase.md) | Sweep, count, carry, blink or run a scripted game | Repeatable visual demonstrations |
+| [SM1628 and SM1628B](docs/driver-variants.md) | Shared programming and hardware differences | Know what depends on the variant |
+| [1. Identify and connect the panel](docs/01-connect.md) | Supply, ground, DATA, CLK and STB | Connect the panel to an Uno |
+| [2. Run the first display test](docs/02-first-display.md) | Upload a small example and check the result | Count through numeric positions |
+| [3. Map your own panel](docs/manual-mapping.md) | Select columns and individual bits | Record your digit, segment and symbol map |
+| [4. Understand memory and commands](docs/04-memory.md) | Native versus swapped wiring, frame construction and transmission | Choose the bytes you send |
+| [5. Control numbers and effects](docs/filming-showcase.md) | Counting, carry, patterns and timing | Try repeatable display demonstrations |
 
-**Same driver does not mean same panel.** A panel manufacturer can connect the
-display differently, swap the digit/segment roles, reorder digits or allocate
-bits to icons. The transport may be reusable while the visible map is different.
-Our panel has seven numeric positions and three symbol groups. It is not a
-universal wiring profile. See the [reference map](docs/panel-map.md).
+The [reference panel map](docs/panel-map.md) applies these ideas to our assembled
+DVD panel: seven numeric digits and three symbol groups. It is one worked
+example, not a universal panel configuration.
 
-This tutorial writes LED display RAM over the three-wire interface; the selected
-Uno pins are ordinary GPIO, not a requirement to use hardware-SPI pins. The IC's
-key-scan read function and infrared decoding are outside these examples. START
-is read directly by the Uno on D4; the panel's IR connection is unused.
+## What you need
 
-## Choose a sketch
+An **Arduino Uno / ATmega328P at 16 MHz**, a suitable SM1628 or SM1628B panel,
+an appropriate panel supply, and the three 1 kΩ signal resistors used in our
+connection example. No external Arduino library is required. Node.js is only
+for automated developer tests.
 
-| Sketch folder | Purpose | Serial Monitor |
+Download the repository ZIP and extract it. Open the `.ino` inside the chosen
+sketch folder, keeping its `.h` files alongside it. Select **Arduino Uno** and
+the correct port, then upload. A new sketch replaces the previous program.
+
+| Sketch | Purpose | Serial Monitor |
 |---|---|---|
-| [PanelDemo](firmware/PanelDemo) | Small automatic numeric display example | Not required |
-| [ManualMap](firmware/ManualMap) | Hold and inspect individual columns/bits | 9600 baud; Newline or Both |
-| [JoystickTest](firmware/JoystickTest) | Read the two analog inputs | 115200 baud |
-| [PanelSnake](firmware/PanelSnake) | Joystick-controlled Snake | 115200 baud; pace commands need Enter |
-| [PanelShowcase](firmware/PanelShowcase) | Display effects and scripted Snake | 115200 baud; Newline or Both |
+| [PanelDemo](firmware/PanelDemo) | Small numeric example; start here for the reference panel | Not required |
+| [ManualMap](firmware/ManualMap) | Inspect and map an unfamiliar panel | 9600 baud; Newline or Both |
+| [PanelShowcase](firmware/PanelShowcase) | Select numbers, counting, carry and effects | 115200 baud; Newline or Both |
 
-Download the repository ZIP and extract it, then open the `.ino` inside the
-matching sketch folder. Keep any `.h` files beside that `.ino`. Select **Arduino
-Uno** and the correct port, then upload. Uploading another sketch replaces the
-previous program on the board. It does not install a second running application.
+The selected Uno pins are ordinary GPIO: this interface does not require the
+hardware-SPI pins. These examples write display RAM; the IC's key-scan read
+function and infrared decoding are not covered. The panel's IR pin is unused.
 
-**Pin ownership:** these sketches preserve the working implementation's
-whole-port initialization. Display diagnostics drive D0-D13 as outputs, with
-D0 restored as serial input in ManualMap. PanelSnake additionally restores D4
-as START input. Read the wiring guide before attaching other peripherals.
-This is not drop-in firmware for other Arduino architectures.
+**Pin ownership:** the working sketches retain whole-port initialization.
+PanelDemo drives D0–D13 as outputs; ManualMap restores D0 as serial input.
+PanelShowcase also restores D4 as an input. Read the connection guide before
+attaching other peripherals. Other Arduino architectures need adaptation.
 
-[Troubleshooting](docs/troubleshooting.md) · [Circuit parts](docs/circuit-inventory.md)
-· [Datasheets](docs/datasheets.md) · [How the code is organized](docs/code-guide.md)
-· [Tests](docs/validation.md) · [Credits](CREDITS.md)
+## Optional application: Snake
+
+Once you can control the display, [build the Snake example](docs/snake-test.md)
+to combine the driver with a joystick, START button and active buzzer. The
+[joystick test](firmware/JoystickTest) and [game sketch](firmware/PanelSnake)
+are separate from the display-only learning path. PanelShowcase also includes
+a repeatable scripted game demonstration.
+
+## Further help
+
+[Troubleshooting](docs/troubleshooting.md) · [Code guide](docs/code-guide.md)
+· [Datasheets](docs/datasheets.md) · [Optional game circuit](docs/circuit-inventory.md)
+· [Validation](docs/validation.md) · [Authors and references](CREDITS.md)

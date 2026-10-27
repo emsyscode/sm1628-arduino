@@ -25,3 +25,10 @@ simulation are not optical/electrical hardware validation. Keep developer build
 results in docs/validation.md, not the main tutorial narrative. Do not add failed
 historical drivers, production scripts, raw footage or internal filming notes.
 Retain independent original sources and code credits even when pruning history.
+
+Creator direction: this is Jose Luis Monteiro's updated standalone driver
+tutorial, developed/tested with TidusM, not a third-party adaptation. Use current
+authorship wording, not 'based on his code'. Preserve immutable regression
+fixtures without putting development history in the beginner path. Teach both
+SM1628 and SM1628B from the outset. Distinguish shared programming, variant
+hardware differences and panel-specific mapping. Keep Snake optional.

@@ -1,5 +1,5 @@
 /*
- ManualMap - interactive Uno diagnostic, based on Jose Luis Monteiro's panel test.
+ ManualMap - interactive Uno diagnostic for SM1628 / SM1628B panels.
 
  HOW TO USE
  1. Use the tested panel wiring: D7 DATA, D8 CLK, D9 STB, common ground.

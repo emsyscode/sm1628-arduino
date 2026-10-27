@@ -1,14 +1,16 @@
-# Credits and source material
+# Authors and references
 
-Original display transport, working panel sketch, hardware investigation and
-joystick measurements: **José Luis Monteiro**. Project direction, footage,
-testing and tutorial preparation: **TidusM and José Luis Monteiro**.
+**José Luis Monteiro** — driver tutorial, firmware, hardware investigation and
+testing. **TidusM** — tutorial development, testing and presentation, together
+with José Luis Monteiro. This is the updated tutorial they developed and tested
+together.
 
-The original supplied sketch and panel drawing are retained under reference/.
-The tutorial connector photographs and annotations were supplied by the project
-authors. Sunmoon authored the linked SM1628/SM1628B datasheets; their mirrors
-are source references, not authors of this firmware.
+The panel photographs, annotations and reverse-engineering drawing were supplied
+by the authors. Sunmoon authored the linked SM1628/SM1628B datasheets; the sites
+hosting PDF copies are reference mirrors.
 
-This repository currently has no distribution-license file. Do not describe it
-as MIT-licensed or licensed by the datasheet mirror. A release license must be
-chosen by the code rights holders; attribution alone does not choose one.
+Maintainers retain a frozen regression source under reference/ and a comparison
+fixture under tests/fixtures/. Start with README.md for the current tutorial.
+
+This repository has no distribution-license file yet. The authors should choose
+a license before public release; attribution alone does not grant one.

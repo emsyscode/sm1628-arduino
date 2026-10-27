@@ -1,4 +1,4 @@
-# 6. Display effects and scripted Snake
+# 5. Control numbers and display effects
 
 PanelShowcase is a standalone demonstration using the reference map and working
 transport. No joystick is required.

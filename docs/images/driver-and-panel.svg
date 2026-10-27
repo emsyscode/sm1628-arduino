@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="510" viewBox="0 0 1080 510" role="img" aria-labelledby="title desc">
+  <title id="title">SM1628 and SM1628B share the display interface</title>
+  <desc id="desc">Arduino connects through DATA, CLK and STB to either SM1628 or SM1628B. Both use the same display commands and 14-byte memory. The connected panel determines the physical display map. The referenced SM1628 uses internal RC and pin 1 NC; SM1628B uses an external frequency-setting resistor on OSC pin 1.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="none" stroke="#159f95" stroke-width="1.6"/></marker>
+  </defs>
+  <rect width="1080" height="510" rx="18" fill="#101b25"/>
+  <g font-family="Arial, sans-serif" fill="#edf5fa">
+    <text x="38" y="49" font-size="26" font-weight="700">Two variants. Same display programming.</text>
+    <rect x="38" y="162" width="186" height="118" rx="12" fill="#1d3545" stroke="#66d3c6"/>
+    <text x="131" y="214" text-anchor="middle" font-size="23">Arduino Uno</text>
+    <text x="131" y="249" text-anchor="middle" font-size="18" fill="#c2d2dc">D7 · D8 · D9</text>
+    <g stroke="#66d3c6" stroke-width="3" fill="none">
+      <path d="M224 221 H325 V146 H375" marker-end="url(#arrow)"/>
+      <path d="M325 221 V300 H375" marker-end="url(#arrow)"/>
+    </g>
+    <text x="245" y="83" font-size="18" fill="#66d3c6">DATA / CLK / STB</text>
+    <rect x="382" y="98" width="270" height="111" rx="12" fill="#1d3545" stroke="#66d3c6"/>
+    <text x="517" y="134" text-anchor="middle" font-size="24" font-weight="700">SM1628</text>
+    <text x="517" y="167" text-anchor="middle" font-size="17">Internal RC</text>
+    <text x="517" y="193" text-anchor="middle" font-size="17" fill="#c2d2dc">Pin 1: NC</text>
+    <text x="517" y="237" text-anchor="middle" font-size="17" fill="#c2d2dc">use either variant</text>
+    <rect x="382" y="253" width="270" height="128" rx="12" fill="#1d3545" stroke="#66d3c6"/>
+    <text x="517" y="288" text-anchor="middle" font-size="24" font-weight="700">SM1628B</text>
+    <text x="517" y="319" text-anchor="middle" font-size="17">Pin 1: OSC resistor → GND</text>
+    <text x="517" y="348" text-anchor="middle" font-size="17" fill="#c2d2dc">Improved protection</text>
+    <g stroke="#66d3c6" stroke-width="3" fill="none">
+      <path d="M652 146 H710 V221 H766" marker-end="url(#arrow)"/>
+      <path d="M652 300 H710 V221"/>
+    </g>
+    <rect x="775" y="162" width="267" height="118" rx="12" fill="#1d3545" stroke="#66d3c6"/>
+    <text x="908" y="206" text-anchor="middle" font-size="23">Your LED panel</text>
+    <text x="908" y="242" text-anchor="middle" font-size="18" fill="#c2d2dc">Map its actual wiring</text>
+    <text x="775" y="317" font-size="17" fill="#c2d2dc">Native: 7 digits × 10 segments</text>
+    <text x="775" y="347" font-size="17" fill="#c2d2dc">Our panel: 10 groups × 7 lights</text>
+    <path d="M38 409 H1042" stroke="#38505f"/>
+    <text x="38" y="445" font-size="20" fill="#66d3c6">Shared commands · 14-byte display RAM · Panel-specific mapping</text>
+    <text x="38" y="479" font-size="15" fill="#c2d2dc">Concept diagram, not a wiring schematic. Variant details: referenced Sunmoon datasheets.</text>
+  </g>
+</svg>

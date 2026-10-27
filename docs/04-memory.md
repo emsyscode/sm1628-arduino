@@ -60,6 +60,23 @@ The raw-column number is also not the engineer's Grid label. The full
 
 ## Sending the frame
 
+The display commands below are shared by SM1628 and SM1628B. These are bytes
+sent to the driver, not Serial Monitor commands:
+
+| Command | Meaning | Where it is used |
+|---|---|---|
+| `0x03` | Select native 7-digit/10-segment mode | Initialization and the preserved frame sequence |
+| `0x40` | Write display RAM with automatic address increment | Initialize the write mode |
+| `0xC0` | Start writing at RAM address `0x00` | Before the fourteen frame bytes |
+| `0x80` | Display off | Blank during the working update sequence |
+| `0x8F` | Display on, maximum brightness setting | Restore display after writing |
+
+Mode selection describes the IC outputs. It does not mean that your panel has
+seven physical digits: the transposed arrangement above uses the same mode.
+The write-mode command chooses how later RAM data is handled; it does not
+itself draw anything. The address command selects where the following data
+begins. Keep command transactions and frame data distinct in your sender.
+
 The working sender shifts each byte **least significant bit first**. STB frames
 a transaction; CLK rising edges carry input data. Our initialization selects
 mode 0x03, write/auto-increment 0x40 and display on/full brightness 0x8F.
