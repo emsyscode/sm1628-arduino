@@ -194,3 +194,8 @@ circuit inventory is a parts reference, not a complete joystick/buzzer schematic
 [Troubleshooting](docs/troubleshooting.md) · [Code guide](docs/code-guide.md)
 · [Datasheets](docs/datasheets.md) · [Optional game circuit](docs/circuit-inventory.md)
 · [Validation](docs/validation.md) · [Authors and references](CREDITS.md)
+
+## License
+
+This project's code and documentation are available under the [MIT License](LICENSE).
+Externally linked datasheets remain the property of their respective rights holders.
