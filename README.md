@@ -3,6 +3,9 @@
 Connect an LED panel to an Arduino Uno, understand the driver's commands and
 display memory, find your panel's segment map, and control numbers and symbols.
 
+**Watch the project video:** [Playing Snake on a seven-segment display](https://www.youtube.com/watch?v=3hOSXTLOnHo).
+See the salvaged panel in action, from mapping its connections to playing the game.
+
 **SM1628 or SM1628B? Both use the programming approach taught here.** The same
 three-wire interface, display commands and 14-byte RAM layout apply to these
 examples. There is no separate B-version sketch or variant selector. The main
