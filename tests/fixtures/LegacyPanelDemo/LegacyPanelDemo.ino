@@ -1,4 +1,4 @@
-// Refactor of Jose Luis Monteiro's user-tested seven-digit panel sketch.
+// Seven-digit panel regression comparison.
 // Keeps its active digit-test sequence, GPIO setup, packet bytes and delays.
 // Board: Arduino Uno / ATmega328P, 16 MHz. No external display library required.
 #include <Arduino.h>

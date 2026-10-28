@@ -214,7 +214,7 @@ void printHelp() {
   Serial.println(F("clear / c    Blank and hold. show resends current frame."));
   Serial.println(F("frame / f    Print all fourteen bytes. status prints mode."));
   Serial.println(F("help / ?     This menu. Display holds until next command."));
-  Serial.println(F("Raw columns are RAM bit positions, NOT father's Grid labels."));
+  Serial.println(F("Raw columns are RAM bit positions, NOT panel Grid labels."));
 }
 
 void renderSelection() {
