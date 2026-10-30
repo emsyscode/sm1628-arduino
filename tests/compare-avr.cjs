@@ -1,4 +1,4 @@
-// Compare actual compiled output of the supplied sketch and the refactor.
+// Compare the compiled regression reference and its comparison fixture.
 // No replacement driver model: both .hex files execute their own AVR firmware.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -10,7 +10,7 @@ const referenceFile = path.join(__dirname,
 const raw = fs.readFileSync(referenceFile);
 assert.equal(crypto.createHash('sha256').update(raw).digest('hex'),
   '4e9521dc761201b3c6feb347db51230398487458f13151ba866038d02293b9b4',
-  'The user-supplied reference must remain byte-for-byte unchanged');
+  'The regression reference must remain byte-for-byte unchanged');
 const source = raw.toString('utf8');
 const patterns = Array.from({length:10}, (_,n) => {
   const block = source.match(new RegExp('unsigned int segNum'+n+'\\[\\]\\s*=\\s*\\{([\\s\\S]*?)\\};'))[1];

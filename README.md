@@ -6,17 +6,16 @@ display memory, find your panel's segment map, and control numbers and symbols.
 **Watch the project video:** [Playing Snake on a seven-segment display](https://www.youtube.com/watch?v=3hOSXTLOnHo).
 See the salvaged panel in action, from mapping its connections to playing the game.
 
-**SM1628 or SM1628B? Both use the programming approach taught here.** The same
-three-wire interface, display commands and 14-byte RAM layout apply to these
-examples. There is no separate B-version sketch or variant selector. The main
-hardware differences are the oscillator connection and the B variant's improved
-protection; see the [short comparison](docs/driver-variants.md).
+**The examples work with both SM1628 and SM1628B.** They share the three-wire
+interface, display commands and 14-byte RAM layout used here. Their oscillator
+connections differ, and the B variant adds improved protection; see the
+[comparison](docs/driver-variants.md) before wiring a bare IC.
 
 ![Both drivers use the same interface; the panel determines the display map](docs/images/driver-and-panel.svg)
 
-**Same driver does not mean same panel wiring.** Identify your connector and
-map your display before copying the reference panel's lookup table. Changing
-the IC suffix alone does not call for a new map; changing the panel can.
+**Same driver does not mean same panel wiring.** Manufacturers connect the
+digits and symbols differently, so identify your connector and map your display
+before copying the reference panel's lookup table.
 
 ## Tutorial contents
 
@@ -156,22 +155,16 @@ These examples use our panel map; adapt it after mapping another panel.
 No joystick is needed. For the remaining commands and expected behavior,
 see [display effects](docs/display-effects.md).
 
-## What you need
-
-An **Arduino Uno / ATmega328P at 16 MHz**, a suitable SM1628 or SM1628B panel,
-an appropriate panel supply, and the three 1 kΩ signal resistors used in our
-connection example. No external Arduino library is required. Node.js is only
-for automated developer tests.
-
-Download the repository ZIP and extract it. Open the `.ino` inside the chosen
-sketch folder, keeping its `.h` files alongside it. Select **Arduino Uno** and
-the correct port, then upload. A new sketch replaces the previous program.
+## Display examples
 
 | Sketch | Purpose | Serial Monitor |
 |---|---|---|
 | [PanelDemo](firmware/PanelDemo) | Small numeric example; start here for the reference panel | Not required |
 | [ManualMap](firmware/ManualMap) | Inspect and map an unfamiliar panel | 9600 baud; Newline or Both |
 | [PanelShowcase](firmware/PanelShowcase) | Select numbers, counting, carry and effects | 115200 baud; Newline or Both |
+
+The sketches need no external Arduino library. Node.js is only used for the
+[automated tests](docs/validation.md).
 
 The selected Uno pins are ordinary GPIO: this interface does not require the
 hardware-SPI pins. These examples write display RAM; the IC's key-scan read

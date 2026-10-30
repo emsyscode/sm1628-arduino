@@ -125,8 +125,8 @@ void setup() {
   TCCR1B |= (1 << CS12);
   TIMSK1 |= (1 << OCIE1A);
 
-  // Compatibility setup retained exactly from the user-tested sketch.
-  // It takes ownership of ALL Uno D0..D13 pins; disconnect other peripherals.
+  // Whole-port setup: D0..D13 become outputs.
+  // Disconnect other peripherals before running this sketch.
   CLKPR = 0x80;
   DDRD = 0xFF;
   PORTD = 0;

@@ -1,10 +1,11 @@
 # Reference DVD panel map
 
-This table combines the engineer's group identification with photographed raw
-column tests. Engineer numeric positions count from the right. Firmware numeric
-positions below count from the left. Neither is an IC package-pin number.
+This table relates the visible digits and symbols to RAM columns and the Grid
+labels on the [wiring drawing](../reference/panel-reverse-engineering-original.jpeg).
+The drawing numbers numeric positions from the right; this table numbers them
+from the left. Neither numbering system refers to IC package pins.
 
-| Physical function | Numeric position from left | Raw RAM column | Engineer Grid label |
+| Physical function | Numeric position from left | Raw RAM column | Grid label on drawing |
 |---|---:|---:|---:|
 | Leftmost numeric digit | 1 | 0 | 6 |
 | Numeric digit | 2 | 1 | 8 |
@@ -17,13 +18,12 @@ positions below count from the left. Neither is an IC package-pin number.
 | Wheel group | - | 8 | 9 |
 | DVD, VCD, MP3, PBC, Play, Pause, remaining wheel light | - | 9 | 10 |
 
-The engineer identifies the complete groups. The photographed `column 0 7`
-then `n` test establishes numeric positions and only the subset of icons enabled
-by the 7 mask. It does not identify every individual icon bit. In particular,
-an isolated central-colon bit is not assigned in the game.
+The complete symbol groups are listed above. The `column 0 7`, then `n` test
+lights only the bars and icons selected by the 7 mask. Use individual-bit tests
+to map the rest of a group. The game does not select an isolated central-colon bit.
 
 Numeric lookup from left to right: `{0, 1, 7, 2, 3, 4, 5}`.
-Engineer Grid labels in the same physical order: `{6, 8, 7, 5, 4, 3, 2}`.
+Grid labels on the drawing, in the same physical order: `{6, 8, 7, 5, 4, 3, 2}`.
 Do not obtain one by adding/subtracting one from the other.
 
 For another panel, use [manual mapping](manual-mapping.md), retain your measured

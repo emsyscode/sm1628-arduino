@@ -1,8 +1,8 @@
 #pragma once
 #include <stdint.h>
 
-// Same segment/junction rules as the browser prototype:
-// seven digits, seven body/food cells per digit; invisible gaps are skipped.
+// Seven digits with seven playable segments each. Movement skips the gaps
+// between digits; those gaps cannot contain the snake or food.
 struct SnakeGame {
   enum Direction : uint8_t {
     UP,

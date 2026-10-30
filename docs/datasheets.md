@@ -29,6 +29,6 @@ Document identity SHA-256:
 - SM1628: 77b782fa46876d08068edc68219a1261f0f9ff492389f7e013ed64138fc3b8fa
 - SM1628B: b4d44f8075cf34618a423056383d312d1c13e392bccfd5e08536428ad60e488a
 
-The exact local copies were checked for the memory table and command diagrams.
-The engineer's actual panel explanation and measured map remain separate
-evidence: neither a datasheet nor an identical IC marking identifies panel wiring.
+The datasheets describe the IC, not the connections made by a panel manufacturer.
+Use the [panel map](panel-map.md) for this build and [ManualMap](manual-mapping.md)
+to identify the wiring of another panel.

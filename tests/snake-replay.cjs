@@ -1,4 +1,4 @@
-// Rehearsed route fixture checked against the original browser game model.
+// Check the fixed replay route, score and end sequence with compiled firmware.
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
@@ -119,5 +119,5 @@ for (const f of m.frames) {
     assert.equal(f.data[row * 2] & 64, 0, 'symbol groups stay off');
   }
 }
-assert.equal(m.buzzerEdges.filter(e => e.on).length, 0, 'filming remains silent');
+assert.equal(m.buzzerEdges.filter(e => e.on).length, 0, 'replay remains silent');
 console.log('PASS: shared rules, all38 body states, seven foods/growth, collision, GAME/OVER/score, repeatable round, looping, hold/stop, independent pace/blinking and numeric-only silent output.');

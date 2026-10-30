@@ -41,10 +41,10 @@ header keeps both Arduino sketch folders self-contained; tests check equality.
 
 ## Maintenance details
 
-The working Uno port/Timer1 setup is retained for compatibility. The timer's
-old flag is not the game's scheduler. Do not remove it, replace the sender or
-generalize to another board simply because a compile succeeds. Hardware behavior
-needs its own comparison when electrical timing/setup is changed.
+The sketches configure the Uno ports directly and enable Timer1. The interrupt
+updates `legacySeconds` and `legacyFlag`; the game uses `millis()` for scheduling.
+Changes to the sender, clock or port setup need a panel test as well as a build
+check, since compiling cannot show whether the LEDs refresh correctly.
 
 Original source is retained under `reference/` for attribution and regression.
 The exact legacy comparator lives under `tests/fixtures/`, not among tutorial

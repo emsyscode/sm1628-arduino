@@ -18,7 +18,7 @@
 
  snake plays one scripted round; snake-loop repeats it without joystick input.
  Use pace 450 before snake to match the game's movement interval.
- This is repeatable demonstration footage, including a scripted game replay.
+ The replay uses fixed turns and food positions; use PanelSnake for manual play.
  Symbols are intentionally included only in groups/all/blink.
  Other panels may require a different column/segment map.
 */
@@ -67,7 +67,7 @@ constexpr uint16_t kReplayDrawMs = 40;
 SnakeReplay replay;
 
 // Each cue is shown immediately, then held for ticks * pace milliseconds.
-// Includes a 1.5 s blank pre-roll and a final blank; about 46.7 s total.
+// Begins with 1.5 s blank and ends blank; about 46.7 s total.
 struct Cue {
   uint8_t effect;
   uint16_t pace, ticks;
@@ -375,7 +375,7 @@ void help() {
   Serial.println(F("pace 250 sets individual step interval50..2000ms (default500)."));
   Serial.println(F("demo=full sequence ONCE; loop=repeats; hold=freeze; stop=blank immediately"));
   Serial.println(F("Demo timings are fixed; pace is rejected during demo. status=state; ?=help."));
-  Serial.println(F("Camera start/stop stays manual. Snake mode is scripted playback."));
+  Serial.println(F("Snake mode plays a fixed round without joystick input."));
 }
 
 void executeLine() {

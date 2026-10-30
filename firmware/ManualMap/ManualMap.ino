@@ -35,8 +35,7 @@ constexpr uint8_t kFrameBytes = 14;
 
 #include "OriginalPatterns.h"
 
-// Timer1 state is retained by the compatible Uno startup setup.
-// Display updates do not use these clock values.
+// Timer1 interrupt counters; display updates do not read these values.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
@@ -92,7 +91,7 @@ void clearPanel() {
 }
 
 // Manual state: no automatic test loop and no heap allocation.
-// Photo-derived numeric positions, left to right; not engineer Grid labels.
+// Numeric RAM columns, left to right; distinct from Grid labels on the drawing.
 constexpr uint8_t kDigitColumns[] = {0, 1, 7, 2, 3, 4, 5};
 constexpr uint8_t kDigitCount = sizeof(kDigitColumns);
 
@@ -410,15 +409,14 @@ void setup() {
   TCCR1B |= (1 << CS12);
   TIMSK1 |= (1 << OCIE1A);
 
-  // Compatibility setup retained exactly from the user-tested sketch.
-  // It takes ownership of ALL Uno D0..D13 pins; disconnect other peripherals.
+  // Whole-port setup: D0..D13 become outputs.
+  // Disconnect other peripherals before running this sketch.
   CLKPR = 0x80;
   DDRD = 0xFF;
   PORTD = 0;
   DDRB = 0xFF;
   PORTB = 0;
-  // Explicit change for manual serial input: restore Uno RX (D0) as input.
-  // D1..D13 retain the baseline setup. No joystick pins are configured here.
+  // Restore D0 as serial RX; D1..D13 stay configured as outputs.
   pinMode(0, INPUT);
   initializePanel();
   clearPanel();

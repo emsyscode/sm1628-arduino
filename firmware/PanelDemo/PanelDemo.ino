@@ -17,8 +17,7 @@ constexpr uint8_t kFrameBytes = 14;
 const uint8_t kNumeralMasks[10] = {0x3F, 0x6, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x67};
 constexpr uint8_t kDigitColumns[7] = {0, 1, 7, 2, 3, 4, 5};
 
-// Timer1 state is retained by the compatible Uno startup setup.
-// Display updates do not use these clock values.
+// Timer1 interrupt counters; display updates do not read these values.
 volatile uint8_t legacySeconds = 0;
 volatile bool legacyFlag = true;
 
@@ -94,7 +93,7 @@ void showTestNumeral(uint8_t numeral, uint8_t digit) {
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);  // Preserved from the working setup; no new serial output.
+  Serial.begin(9600);  // This example does not print serial messages.
   cli();
   TCCR1A = 0;
   TCCR1B = 0;
@@ -104,8 +103,8 @@ void setup() {
   TCCR1B |= (1 << CS12);
   TIMSK1 |= (1 << OCIE1A);
 
-  // Compatibility setup retained exactly from the user-tested sketch.
-  // It takes ownership of ALL Uno D0..D13 pins; disconnect other peripherals.
+  // Whole-port setup: D0..D13 become outputs.
+  // Disconnect other peripherals before running this sketch.
   CLKPR = 0x80;
   DDRD = 0xFF;
   PORTD = 0;

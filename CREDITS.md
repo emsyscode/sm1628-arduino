@@ -7,8 +7,5 @@ The panel photographs, annotations and reverse-engineering drawing were supplied
 by the authors. Sunmoon authored the linked SM1628/SM1628B datasheets; the sites
 hosting PDF copies are reference mirrors.
 
-Maintainers retain a frozen regression source under reference/ and a comparison
-fixture under tests/fixtures/. Start with README.md for the current tutorial.
-
 Project code and documentation: [MIT License](LICENSE). The linked Sunmoon
 datasheets are third-party references and are not relicensed by this repository.

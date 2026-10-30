@@ -8,8 +8,8 @@ Three different things must be kept separate: **the IC's native outputs**, the
 The datasheets describe a native seven-digit, ten-segment mode. Its display RAM
 has seven pairs of bytes, at addresses 0x00-0x0D. The display manufacturer used
 the segment-output side as ten group-common connections and the digit-output
-side as seven shared segment connections. As the engineer explains, this uses
-a common-anode display arrangement instead of the native common-cathode layout.
+side as seven shared segment connections. The panel uses a common-anode display
+arrangement instead of the native common-cathode layout.
 
 That produces ten groups of seven possible lights on this assembled panel:
 seven numeric digits and three symbol groups. It does not add more RAM or
@@ -55,7 +55,7 @@ void putGroup(uint8_t frame[14], uint8_t column, uint8_t segments) {
 
 This snippet illustrates our layout; it is not a universal panel renderer.
 The sketches use the same column/row principle with their own frame builders.
-The raw-column number is also not the engineer's Grid label. The full
+The raw-column number is different from the Grid label on the wiring drawing. The
 [reference map](panel-map.md) records both explicitly.
 
 ## Sending the frame
@@ -86,9 +86,8 @@ STB LOW, address 0xC0, fourteen bytes, STB HIGH, display on 0x8F.
 A transposed digit spans seven byte-pair rows. Sending the whole buffer keeps
 the other numeric and symbol columns consistent and gives every frame builder
 one predictable update path. That is why this implementation sends all 14 bytes.
-The IC also supports addressed writes; a blanket claim that the protocol
-rejects partial writes would be incorrect. The existing clear routine itself
-uses individual addressed zero writes. A partial-update implementation would
+The IC also supports addressed writes. The clear routine uses individual
+addressed zero writes. A partial-update implementation would
 have to preserve the other bits and update every affected address correctly.
 
 The MCU updates RAM; the SM1628 scans the LEDs internally. A 40 ms game frame

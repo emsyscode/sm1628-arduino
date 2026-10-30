@@ -1,16 +1,13 @@
 # Connector photographs
 
-Photographs and labelled versions by José Luis Monteiro. Original JPEG copies are unchanged. The labelled JPEGs are compressed
-derivatives of the supplied PNG annotations; no connections or labels redrawn.
-Header A and B name these photographed layouts, not universal board revisions.
+Photographs and connector labels by José Luis Monteiro. Header A and Header B
+identify the two photographed layouts; they are not board revision names.
 
 Unannotated originals: [Header A](header-5v-ir-gnd-clk-stb-data-original.jpg),
 [Header B](header-v-r-g-d-c-s-original.jpg).
 
-driver-and-panel.svg is an original tutorial diagram. It summarizes the shared
-display programming, documented variant differences and panel-specific mapping.
-It is not a pin-by-pin wiring schematic or third-party component artwork.
+`driver-and-panel.svg` compares the driver variants and shows why display maps
+depend on panel wiring. Use the connection guide for individual wire connections.
 
-snake-connections.svg is an original logical connection diagram of the power,
-joystick, active-buzzer and START circuits described by José Luis Monteiro.
+`snake-connections.svg` shows the power, joystick, active-buzzer and START circuits.
 Transistor B/C/E labels identify terminals, not their physical lead order.
